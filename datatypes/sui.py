@@ -5,10 +5,10 @@ from pydantic import BaseModel
 
 
 class Arrow(Enum):
-    LEFT = 3
-    UP = 2
-    DOWN = 1
     RIGHT = 0
+    DOWN = 1
+    UP = 2
+    LEFT = 3
 
 
 class Sui8192TransactionResult(BaseModel):

@@ -47,10 +47,12 @@ def get_owned_8192_objects(response: ExplorerGetOwnedObjectsResponse) -> list[Ex
 
 def get_active_game_8192_ids(games: list[ExplorerBodyResult]) -> list[str]:
     active_game_ids = []
+
     for item in games:
         content_fields = item.data.content.fields
         if not content_fields.game_over:
             active_game_ids.append(item.data.objectId)
+
     return active_game_ids
 
 

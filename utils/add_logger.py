@@ -2,7 +2,7 @@ from sys import stderr
 
 from loguru import logger
 
-LOG_OUTPUT = "./log/stargaze.log"
+LOG_OUTPUT = "./log/sui.log"
 LOG_ROTATION = "50 MB"
 
 
