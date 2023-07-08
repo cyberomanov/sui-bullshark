@@ -61,7 +61,7 @@ def execute_move(sui_config: SuiConfig, game_id: str, move: Arrow) -> Sui8192Mov
         )
 
 
-def mint_game(sui_config: SuiConfig) -> Sui8192CreateResult | None:
+def mint_game(sui_config: SuiConfig) -> Sui8192CreateResult:
     transaction = init_transaction(sui_config=sui_config)
 
     split = transaction.split_coin(
