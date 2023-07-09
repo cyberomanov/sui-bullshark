@@ -4,10 +4,10 @@ import requests
 from loguru import logger
 
 from data import SUI_MAINNET_RPC
-from datatypes import ExplorerGetOwnedObjectsResponse, ExplorerBodyResult
+from datatypes import ExplorerResponse, ExplorerBodyResult
 
 
-def get_sui_owned_objects_response(address: str) -> ExplorerGetOwnedObjectsResponse:
+def get_sui_owned_objects_response(address: str) -> ExplorerResponse:
     data = {
         "method": "suix_getOwnedObjects",
         "jsonrpc": "2.0",
@@ -30,12 +30,12 @@ def get_sui_owned_objects_response(address: str) -> ExplorerGetOwnedObjectsRespo
     }
     response = requests.post(url=SUI_MAINNET_RPC, json=data)
     if response.status_code == 200:
-        return ExplorerGetOwnedObjectsResponse.parse_obj(json.loads(response.content))
+        return ExplorerResponse.parse_obj(json.loads(response.content))
     else:
         logger.error(json.loads(response.content))
 
 
-def get_owned_8192_objects(response: ExplorerGetOwnedObjectsResponse) -> list[ExplorerBodyResult]:
+def get_owned_8192_objects(response: ExplorerResponse) -> list[ExplorerBodyResult]:
     owned_8192_objects = []
 
     for item in response.result.data:
@@ -66,3 +66,28 @@ def get_active_game_ids(address: str) -> list:
 
 def get_game_items_count(address: str) -> int:
     return len(get_game_items(address=address))
+
+
+def get_sui_object_response(object_id: str) -> ExplorerResponse:
+    data = {
+        "method": "sui_getObject",
+        "jsonrpc": "2.0",
+        "params":
+            [
+                object_id,
+                {
+                    "showType": True,
+                    "showContent": True,
+                    "showOwner": True,
+                    "showPreviousTransaction": True,
+                    "showStorageRebate": True,
+                    "showDisplay": True
+                },
+            ],
+        "id": "2"
+    }
+    response = requests.post(url=SUI_MAINNET_RPC, json=data)
+    if response.status_code == 200:
+        return ExplorerResponse.parse_obj(json.loads(response.content))
+    else:
+        logger.error(json.loads(response.content))

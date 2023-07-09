@@ -67,10 +67,13 @@ class ExplorerBodyResult(BaseModel):
 
 
 class ExplorerResult(BaseModel):
-    data: List[ExplorerBodyResult]
+    data: List[ExplorerBodyResult] | ExplorerDataResult
     nextCursor: Optional[str]
-    hasNextPage: bool
+    hasNextPage: Optional[bool]
 
 
-class ExplorerGetOwnedObjectsResponse(BaseModel):
+class ExplorerResponse(BaseModel):
     result: ExplorerResult
+
+
+
