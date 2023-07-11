@@ -28,6 +28,6 @@ this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) for points in [
 
 ## Update
 1. `cd sui-bullshark`
-2. `git fetch && git pull && git reset --hard`
+2. `git fetch && git reset --hard && git pull`
 3. `pip3 install -r requirements.txt`
 4. `python3 8192.py`
