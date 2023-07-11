@@ -45,7 +45,7 @@ def main_play_game(sui_config: SuiConfig, game_id: str):
                     logger.info(f'{short_address(result.address)} | {result.move.name} | digest: {result.digest}')
                     time.sleep(random.randint(sleep_range_in_sec[0], sleep_range_in_sec[1]))
         except:
-            logger.exception(e)
+            pass
 
 
 def main_mint_game(sui_config: SuiConfig):
@@ -57,25 +57,21 @@ def main_mint_game(sui_config: SuiConfig):
 
 
 def single_executor(sui_config: SuiConfig):
-    try:
-        played_games = get_game_items_count(address=str(sui_config.active_address))
+    played_games = get_game_items_count(address=str(sui_config.active_address))
 
-        while played_games < total_max_8192_games_per_address:
+    while played_games < total_max_8192_games_per_address:
+        active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
+
+        if not active_game_8192_ids:
+            main_mint_game(sui_config=sui_config)
+            time.sleep(random.randint(sleep_range_in_sec[0], sleep_range_in_sec[1]))
             active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
 
-            if not active_game_8192_ids:
-                main_mint_game(sui_config=sui_config)
-                time.sleep(random.randint(sleep_range_in_sec[0], sleep_range_in_sec[1]))
-                active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
+        random_game = random.choice(active_game_8192_ids)
+        logger.info(f'{short_address(str(sui_config.active_address))} | current_game_id: {random_game}')
+        main_play_game(sui_config=sui_config, game_id=random_game)
 
-            random_game = random.choice(active_game_8192_ids)
-            logger.info(f'{short_address(str(sui_config.active_address))} | current_game_id: {random_game}')
-            main_play_game(sui_config=sui_config, game_id=random_game)
-
-        logger.success(f'{short_address(str(sui_config.active_address))} | has played {played_games} games.')
-    except Exception as e:
-        logger.exception(e)
-
+    logger.success(f'{short_address(str(sui_config.active_address))} | has played {played_games} games.')
 
 def pool_executor(sui_configs: list[SuiConfig]):
     with concurrent.futures.ThreadPoolExecutor() as executor:
