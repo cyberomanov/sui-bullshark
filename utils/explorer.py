@@ -1,4 +1,6 @@
 import json
+import random
+import time
 
 import requests
 from loguru import logger
@@ -8,31 +10,51 @@ from datatypes import ExplorerResponse, ExplorerBodyResult
 
 
 def get_sui_owned_objects_response(address: str) -> ExplorerResponse:
-    data = {
-        "method": "suix_getOwnedObjects",
-        "jsonrpc": "2.0",
-        "params":
-            [
-                address,
-                {
-                    "options":
-                        {
-                            "showType": False,
-                            "showOwner": False,
-                            "showContent": True,
-                            "showDisplay": True
-                        }
-                },
-                None,
-                None
-            ],
-        "id": "11"
-    }
-    response = requests.post(url=SUI_MAINNET_RPC, json=data)
-    if response.status_code == 200:
-        return ExplorerResponse.parse_obj(json.loads(response.content))
-    else:
-        logger.error(json.loads(response.content))
+    has_next_page = True
+    next_cursor = None
+    limit = 50
+
+    explorer_response = None
+
+    while has_next_page:
+        data = {
+            "method": "suix_getOwnedObjects",
+            "jsonrpc": "2.0",
+            "params":
+                [
+                    address,
+                    {
+                        "options":
+                            {
+                                "showType": False,
+                                "showOwner": False,
+                                "showContent": True,
+                                "showDisplay": True
+                            }
+                    },
+                    next_cursor,
+                    limit
+                ],
+            "id": "11"
+        }
+        try:
+            response = requests.post(url=SUI_MAINNET_RPC, json=data)
+            if response.status_code == 200:
+                latest_response = ExplorerResponse.parse_obj(json.loads(response.content))
+                has_next_page = latest_response.result.hasNextPage
+                next_cursor = latest_response.result.nextCursor
+
+                if explorer_response:
+                    explorer_response.result.data += latest_response.result.data
+                    time.sleep(random.randint(3, 5))
+                else:
+                    explorer_response = latest_response
+            else:
+                logger.error(json.loads(response.content))
+        except Exception as e:
+            logger.exception(e)
+
+    return explorer_response
 
 
 def get_owned_8192_objects(response: ExplorerResponse) -> list[ExplorerBodyResult]:
