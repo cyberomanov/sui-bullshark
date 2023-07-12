@@ -5,7 +5,7 @@ import time
 from loguru import logger
 from pysui.sui.sui_config import SuiConfig
 
-from config import total_max_8192_games_per_address, sleep_range_in_sec
+from config import total_max_8192_games_per_address, sleep_range_between_txs_in_sec, sleep_range_between_games_in_sec
 from data import VERSION
 from datatypes import Arrow
 from utils import (add_logger,
@@ -32,8 +32,8 @@ def main_play_game(sui_config: SuiConfig, game_id: str):
 
                 result = execute_move(sui_config=sui_config, game_id=game_id, move=move)
                 if result.reason:
-                    logger.warning(f'{short_address(result.address)} | {result.move.name} | '
-                                   f'reason: direction is blocked.')
+                    logger.info(f'{short_address(result.address)} | {result.move.name:>6} | '
+                                f'reason: direction is blocked.')
 
                     if get_sui_object_response(object_id=game_id).result.data.content.fields.game_over:
                         logger.warning(f'{short_address(result.address)} | game_id: {game_id} | reason: game is over.')
@@ -42,8 +42,10 @@ def main_play_game(sui_config: SuiConfig, game_id: str):
                         set_of_failed_arrows.add(result.move)
                 else:
                     failed_arrow = False
-                    logger.info(f'{short_address(result.address)} | {result.move.name} | digest: {result.digest}')
-                    time.sleep(random.randint(sleep_range_in_sec[0], sleep_range_in_sec[1]))
+                    sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+                    logger.info(f'{short_address(result.address)} | {result.move.name:>6} | '
+                                f'digest: {result.digest} | sleep: {sleep}s.')
+                    time.sleep(sleep)
         except:
             pass
 
@@ -64,14 +66,19 @@ def single_executor(sui_config: SuiConfig):
 
         if not active_game_8192_ids:
             main_mint_game(sui_config=sui_config)
-            time.sleep(random.randint(sleep_range_in_sec[0], sleep_range_in_sec[1]))
+            time.sleep(random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1]))
             active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
 
         random_game = random.choice(active_game_8192_ids)
         logger.info(f'{short_address(str(sui_config.active_address))} | current_game_id: {random_game}')
         main_play_game(sui_config=sui_config, game_id=random_game)
 
+        sleep = random.randint(sleep_range_between_games_in_sec[0], sleep_range_between_games_in_sec[1])
+        logger.info(f'{short_address(str(sui_config.active_address))} | sleep: {sleep}s.')
+        time.sleep(sleep)
+
     logger.success(f'{short_address(str(sui_config.active_address))} | has played {played_games} games.')
+
 
 def pool_executor(sui_configs: list[SuiConfig]):
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -95,3 +102,5 @@ if __name__ == '__main__':
         pool_executor(sui_configs=sui_configs)
     except Exception as e:
         logger.exception(e)
+    except KeyboardInterrupt:
+        exit()

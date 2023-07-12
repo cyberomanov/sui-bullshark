@@ -45,20 +45,30 @@ def execute_move(sui_config: SuiConfig, game_id: str, move: Arrow) -> Sui8192Mov
             SuiU64(move.value)
         ],
     )
-    rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
-    if rpc_result.result_data.status == 'success':
+
+    build = transaction.inspect_all()
+    if build.error:
         return Sui8192MoveResult(
             address=str(sui_config.active_address),
-            digest=rpc_result.result_data.digest,
-            move=move
+            digest='',
+            move=move,
+            reason=build.error
         )
     else:
-        return Sui8192MoveResult(
-            address=str(sui_config.active_address),
-            digest=rpc_result.result_data.digest,
-            move=move,
-            reason=rpc_result.result_data.status
-        )
+        rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
+        if rpc_result.result_data.status == 'success':
+            return Sui8192MoveResult(
+                address=str(sui_config.active_address),
+                digest=rpc_result.result_data.digest,
+                move=move
+            )
+        else:
+            return Sui8192MoveResult(
+                address=str(sui_config.active_address),
+                digest=rpc_result.result_data.digest,
+                move=move,
+                reason=rpc_result.result_data.status
+            )
 
 
 def mint_game(sui_config: SuiConfig) -> Sui8192CreateResult:
