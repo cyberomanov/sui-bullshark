@@ -88,15 +88,24 @@ def mint_game(sui_config: SuiConfig) -> Sui8192CreateResult:
             move_vector
         ],
     )
-    rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
-    if rpc_result.result_data.status == 'success':
+
+    build = transaction.inspect_all()
+    if build.error:
         return Sui8192CreateResult(
             address=str(sui_config.active_address),
-            digest=rpc_result.result_data.digest,
+            digest='',
+            reason=build.error
         )
     else:
-        return Sui8192CreateResult(
-            address=str(sui_config.active_address),
-            digest=rpc_result.result_data.digest,
-            reason=rpc_result.result_data.status
-        )
+        rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
+        if rpc_result.result_data.status == 'success':
+            return Sui8192CreateResult(
+                address=str(sui_config.active_address),
+                digest=rpc_result.result_data.digest,
+            )
+        else:
+            return Sui8192CreateResult(
+                address=str(sui_config.active_address),
+                digest=rpc_result.result_data.digest,
+                reason=rpc_result.result_data.status
+            )
