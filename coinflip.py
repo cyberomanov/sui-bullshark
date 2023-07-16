@@ -69,7 +69,7 @@ if __name__ == '__main__':
         mnemonics = read_mnemonics()
         sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
 
-        logger.info('loaded addresses:')
+        logger.info('loaded addresses for coinflip game:')
         logger.info('-' * 66)
 
         for sui_config in sui_configs:
