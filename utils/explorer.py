@@ -5,8 +5,8 @@ import time
 import requests
 from loguru import logger
 
-from data import SUI_MAINNET_RPC
-from datatypes import ExplorerResponse, ExplorerBodyResult
+from config import sui_rpc
+from datatypes import ExplorerResponse, ExplorerBodyResult, ExplorerSuiCoinsResponse
 
 
 def get_sui_owned_objects_response(address: str) -> ExplorerResponse:
@@ -38,7 +38,7 @@ def get_sui_owned_objects_response(address: str) -> ExplorerResponse:
             "id": "11"
         }
         try:
-            response = requests.post(url=SUI_MAINNET_RPC, json=data)
+            response = requests.post(url=sui_rpc, json=data)
             if response.status_code == 200:
                 latest_response = ExplorerResponse.parse_obj(json.loads(response.content))
                 has_next_page = latest_response.result.hasNextPage
@@ -55,6 +55,31 @@ def get_sui_owned_objects_response(address: str) -> ExplorerResponse:
             logger.exception(e)
 
     return explorer_response
+
+
+def get_sui_object_response(object_id: str) -> ExplorerResponse:
+    data = {
+        "method": "sui_getObject",
+        "jsonrpc": "2.0",
+        "params":
+            [
+                object_id,
+                {
+                    "showType": True,
+                    "showContent": True,
+                    "showOwner": True,
+                    "showPreviousTransaction": True,
+                    "showStorageRebate": True,
+                    "showDisplay": True
+                },
+            ],
+        "id": "2"
+    }
+    response = requests.post(url=sui_rpc, json=data)
+    if response.status_code == 200:
+        return ExplorerResponse.parse_obj(json.loads(response.content))
+    else:
+        logger.error(json.loads(response.content))
 
 
 def get_owned_8192_objects(response: ExplorerResponse) -> list[ExplorerBodyResult]:
@@ -90,26 +115,37 @@ def get_game_items_count(address: str) -> int:
     return len(get_game_items(address=address))
 
 
-def get_sui_object_response(object_id: str) -> ExplorerResponse:
+def get_associated_kiosk(address: str) -> str:
+    response = get_sui_owned_objects_response(address=address)
+
+    for item in response.result.data:
+        if item.data.content.fields.for_field:
+            return item.data.content.fields.for_field
+
+
+def get_bullshark_id(kiosk_addr: str):
     data = {
-        "method": "sui_getObject",
+        "method": "suix_getDynamicFields",
         "jsonrpc": "2.0",
-        "params":
-            [
-                object_id,
-                {
-                    "showType": True,
-                    "showContent": True,
-                    "showOwner": True,
-                    "showPreviousTransaction": True,
-                    "showStorageRebate": True,
-                    "showDisplay": True
-                },
-            ],
-        "id": "2"
+        "params": [kiosk_addr],
+        "id": "1"
     }
-    response = requests.post(url=SUI_MAINNET_RPC, json=data)
+    response = requests.post(url=sui_rpc, json=data)
     if response.status_code == 200:
         return ExplorerResponse.parse_obj(json.loads(response.content))
+    else:
+        logger.error(json.loads(response.content))
+
+
+def get_sui_coin_objects(address: str):
+    data = {
+        "method": "suix_getCoins",
+        "jsonrpc": "2.0",
+        "params": [address, "0x2::sui::SUI"],
+        "id": "14"
+    }
+    response = requests.post(url=sui_rpc, json=data)
+    if response.status_code == 200:
+        return ExplorerSuiCoinsResponse.parse_obj(json.loads(response.content))
     else:
         logger.error(json.loads(response.content))

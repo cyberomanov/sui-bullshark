@@ -11,6 +11,11 @@ class Arrow(Enum):
     LEFT = 3
 
 
+class CoinflipSide(Enum):
+    TAILS = 0
+    HEADS = 1
+
+
 class Sui8192TransactionResult(BaseModel):
     address: str
     digest: str
@@ -21,5 +26,5 @@ class Sui8192MoveResult(Sui8192TransactionResult):
     reason: Optional[str]
 
 
-class Sui8192CreateResult(Sui8192TransactionResult):
+class SuiTxResult(Sui8192TransactionResult):
     reason: Optional[str]

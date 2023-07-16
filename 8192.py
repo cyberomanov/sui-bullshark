@@ -11,12 +11,12 @@ from datatypes import Arrow
 from utils import (add_logger,
                    read_mnemonics,
                    get_list_of_sui_configs,
-                   execute_move,
-                   mint_game,
+                   execute_move_tx,
+                   mint_game_tx,
                    short_address,
                    get_game_items_count,
                    get_active_game_ids,
-                   get_sui_object_response)
+                   get_sui_object_response, merge_sui_coins)
 
 
 def main_play_game(sui_config: SuiConfig, game_id: str):
@@ -30,7 +30,7 @@ def main_play_game(sui_config: SuiConfig, game_id: str):
             while not game_over and failed_arrow:
                 move = random.choice(list(set(Arrow) - set_of_failed_arrows))
 
-                result = execute_move(sui_config=sui_config, game_id=game_id, move=move)
+                result = execute_move_tx(sui_config=sui_config, game_id=game_id, move=move)
                 if result.reason:
                     logger.info(f'{short_address(result.address)} | {result.move.name:>6} | '
                                 f'reason: direction is blocked.')
@@ -51,7 +51,7 @@ def main_play_game(sui_config: SuiConfig, game_id: str):
 
 
 def main_mint_game(sui_config: SuiConfig):
-    result = mint_game(sui_config=sui_config)
+    result = mint_game_tx(sui_config=sui_config)
     if result.reason:
         logger.warning(f'{short_address(result.address)} | MINT | digest: {result.digest} | reason: {result.reason}.')
     else:
@@ -65,6 +65,7 @@ def single_executor(sui_config: SuiConfig):
         active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
 
         if not active_game_8192_ids:
+            merge_sui_coins(sui_config=sui_config)
             main_mint_game(sui_config=sui_config)
             time.sleep(random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1]))
             active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))

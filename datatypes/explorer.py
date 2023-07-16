@@ -1,7 +1,7 @@
 from typing import List
-from typing import Optional
+from typing import Optional, Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ExplorerGameId(BaseModel):
@@ -25,6 +25,7 @@ class ExplorerContentMoveObject(BaseModel):
     player: Optional[str]
     score: Optional[str]
     top_tile: Optional[str]
+    for_field: Optional[str] = Field(alias='for')
 
 
 class ExplorerContent(BaseModel):
@@ -36,6 +37,10 @@ class ExplorerContent(BaseModel):
 
 class ExplorerDataContent(BaseModel):
     data: ExplorerContent
+
+
+class ExplorerCoinflipContent(BaseModel):
+    pass
 
 
 class ExplorerDataDisplay(BaseModel):
@@ -60,20 +65,35 @@ class ExplorerDataResult(BaseModel):
     digest: Optional[str]
     display: Optional[ExplorerBodyDisplay]
     content: Optional[ExplorerContent]
+    fields: Optional[Dict]
+    type: Optional[str]
 
 
 class ExplorerBodyResult(BaseModel):
     data: ExplorerDataResult
 
 
+class CoinContent(BaseModel):
+    coinType: Optional[str]
+    coinObjectId: Optional[str]
+    balance: Optional[str]
+
+
 class ExplorerResult(BaseModel):
-    data: List[ExplorerBodyResult] | ExplorerDataResult
+    data: ExplorerDataResult | List[ExplorerBodyResult] | List[ExplorerDataResult]
     nextCursor: Optional[str]
     hasNextPage: Optional[bool]
 
 
+class ExplorerSuiCoinsResult(BaseModel):
+    data: List[CoinContent]
+    nextCursor: Optional[str]
+    hasNextPage: Optional[bool]
+
+
+class ExplorerSuiCoinsResponse(BaseModel):
+    result: ExplorerSuiCoinsResult
+
+
 class ExplorerResponse(BaseModel):
     result: ExplorerResult
-
-
-

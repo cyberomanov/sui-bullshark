@@ -1,6 +1,6 @@
 # SUI-8192
 
-this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) for points in [quests](https://quests.mystenlabs.com/).<br>
+this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) and [coinflip](https://desuicoinflip.io/) for points in [quests](https://quests.mystenlabs.com/).<br>
 [donations are welcome](https://cyberomanov.tech/WTF_donate), if you find this tool helpful.
 
 ## Contents
@@ -10,7 +10,7 @@ this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) for points in [
 1. make sure you have installed `python3.10` or newer.
 2. setup your `config.py` and `data/mnemonic.txt`;
 3. install requirements `pip3 install -r requirements.txt`
-4. run the script `python3 8192.py`
+4. run the script `python3 8192.py` to play **8192** or `python3 coinflip.py` to play **coinflip**.
 ```bash
 18:00:09 | INFO | loaded addresses:
 18:00:09 | INFO | -------------
@@ -25,9 +25,26 @@ this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) for points in [
 18:00:38 | INFO | 0x318a...634b | LEFT | digest: D9HZ19tY46piK8cDQahsmeaT4ppYc9V8ZhUkqY5uc7z1
 18:00:46 | INFO | 0x318a...634b | DOWN | digest: 824KSV1fawU9Sp4abmCWtByj9NHk6geQaYqSRiM7MvUA
 ```
+```bash
+18:22:50 | INFO | loaded addresses:
+18:22:50 | INFO | ------------------------------------------------------------------
+18:22:50 | INFO | 0xe1a0...b61e
+18:22:50 | INFO | ------------------------------------------------------------------
+18:22:57 | INFO | 0xe1a0...b61e | COIN_MERGE | digest: 3rap28SGGvgBmK8znGZ4EFq1GsJjQMxFyA9ecGbFX3Ym
+18:23:07 | INFO | 0xe1a0...b61e | HEADS | digest: CW7giReVvPs7YMxQXy1FD1YghCjpTifz5Y8SRv45BxGU
+18:23:07 | INFO | 0xe1a0...b61e | sleep: 95s.
+18:24:54 | INFO | 0xe1a0...b61e | TAILS | digest: 95sSPEnUmLyKD41e9YZy8uTWLMbfwt4nHsE88eTi85UA
+18:24:54 | INFO | 0xe1a0...b61e | sleep: 161s.
+18:27:46 | INFO | 0xe1a0...b61e | HEADS | digest: GjZywbJyE42eUoTpBwL6ScaPg5EUbL2BJb8GpbuiLZiV
+18:27:46 | INFO | 0xe1a0...b61e | sleep: 176s.
+18:30:48 | INFO | 0xe1a0...b61e | COIN_MERGE | digest: HSYZhf49fC11mBpVWSz5WvvqP76XRR89MDL4gx1hBr6s
+18:30:57 | INFO | 0xe1a0...b61e | HEADS | digest: 9wqAhdPQGHmFe6b79HYihrGMsdjdoWrLteghNY75WxLn
+18:30:57 | INFO | 0xe1a0...b61e | sleep: 75s.
+18:32:12 | SUCCESS | 0xe1a0...b61e | has played 4 games.
+```
 
 ## Update
 1. `cd sui-bullshark`
 2. `git fetch && git reset --hard && git pull`
 3. `pip3 install -r requirements.txt`
-4. `python3 8192.py`
+4. `python3 8192.py` | `python3 coinflip.py`
