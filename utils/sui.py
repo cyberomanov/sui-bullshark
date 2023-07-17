@@ -21,7 +21,7 @@ from data import (SUI_DEFAULT_DERIVATION_PATH,
                   SUI_NATIVE_DENOMINATION,
                   GAME_COINFLIP_ARG5,
                   GAME_COINFLIP_TARGET)
-from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide
+from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide, SuiBalance
 from utils import short_address
 
 
@@ -37,6 +37,20 @@ def get_list_of_sui_configs(mnemonics: list[str]) -> list[SuiConfig]:
         sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
         list_of_sui_configs.append(sui_config)
     return list_of_sui_configs
+
+
+def get_sui_balance(sui_config: SuiConfig) -> SuiBalance:
+    client = SuiClient(config=sui_config)
+    sui_coin_objects: SuiCoinObjects = client.get_gas().result_data
+
+    balance = 0
+    for obj in list(sui_coin_objects.data):
+        balance += int(obj.balance)
+
+    return SuiBalance(
+        int=balance,
+        float=round(balance / 10 ** SUI_NATIVE_DENOMINATION, 2)
+    )
 
 
 def init_transaction(sui_config: SuiConfig) -> SuiTransaction:

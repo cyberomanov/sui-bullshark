@@ -4,6 +4,8 @@ import time
 
 from loguru import logger
 from pysui.sui.sui_config import SuiConfig
+from pysui.sui.sui_clients.sync_client import SuiClient
+from pysui.sui.sui_txresults import SuiCoinObjects
 
 from config import max_flip_count_per_session_in_range, flip_bet_variants_in_sui, sleep_range_between_games_in_sec
 from data import VERSION
@@ -15,7 +17,8 @@ from utils import (add_logger,
                    play_coinflip_tx,
                    get_associated_kiosk,
                    get_bullshark_id,
-                   merge_sui_coins)
+                   merge_sui_coins,
+                   get_sui_balance)
 
 
 def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_addr: str):
@@ -70,12 +73,12 @@ if __name__ == '__main__':
         sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
 
         logger.info('loaded addresses for coinflip game:')
-        logger.info('-' * 66)
+        logger.info('-' * 75)
 
         for sui_config in sui_configs:
-            logger.info(f'{sui_config.active_address}')
+            logger.info(f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI')
 
-        logger.info('-' * 66)
+        logger.info('-' * 75)
 
         pool_executor(sui_configs=sui_configs)
     except Exception as e:

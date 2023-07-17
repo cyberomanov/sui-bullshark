@@ -28,3 +28,8 @@ class Sui8192MoveResult(Sui8192TransactionResult):
 
 class SuiTxResult(Sui8192TransactionResult):
     reason: Optional[str]
+
+
+class SuiBalance(BaseModel):
+    int: int
+    float: float
