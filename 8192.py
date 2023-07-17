@@ -5,7 +5,7 @@ import time
 from loguru import logger
 from pysui.sui.sui_config import SuiConfig
 
-from config import (total_max_8192_games_per_address,
+from config import (total_max_8192_games_per_address_in_range,
                     sleep_range_between_txs_in_sec,
                     sleep_range_between_games_in_sec,
                     start_threads_simultaneously)
@@ -68,8 +68,10 @@ def single_executor(sui_config: SuiConfig):
         time.sleep(random.randint(1, 60))
 
     played_games = get_game_items_count(address=str(sui_config.active_address))
+    games_per_address = random.randint(total_max_8192_games_per_address_in_range[0],
+                                       total_max_8192_games_per_address_in_range[1])
 
-    while played_games < total_max_8192_games_per_address:
+    while played_games < games_per_address:
         active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
 
         if not active_game_8192_ids:

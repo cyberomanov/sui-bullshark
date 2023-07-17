@@ -36,13 +36,16 @@ def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_
                                       bullshark_addr=bullshark_addr,
                                       coinflip_side=coinflip_side,
                                       bet_amount=bet_amount)
-
             sleep = 0
             if result.reason:
                 if result.digest:
                     sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
-                    logger.warning(
+                    logger.error(
                         f'{short_address(result.address)} | {coinflip_side.name} | digest: {result.digest} | '
+                        f'reason: {result.reason} | sleep: {sleep}s.')
+                else:
+                    logger.error(
+                        f'{short_address(result.address)} | {coinflip_side.name} | '
                         f'reason: {result.reason} | sleep: {sleep}s.')
             else:
                 sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])

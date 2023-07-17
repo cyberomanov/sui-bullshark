@@ -63,6 +63,8 @@ def init_transaction(sui_config: SuiConfig, merge_gas_budget: bool = False) -> S
 
 
 def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction) -> SuiTxResult:
+    rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
+
     build = transaction.inspect_all()
     if build.error:
         return SuiTxResult(
@@ -73,19 +75,26 @@ def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction) ->
     else:
         try:
             rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
-            if rpc_result.result_data.status == 'success':
-                return SuiTxResult(
-                    address=str(sui_config.active_address),
-                    digest=rpc_result.result_data.digest
-                )
+            if rpc_result.result_data:
+                if rpc_result.result_data.status == 'success':
+                    return SuiTxResult(
+                        address=str(sui_config.active_address),
+                        digest=rpc_result.result_data.digest
+                    )
+                else:
+                    return SuiTxResult(
+                        address=str(sui_config.active_address),
+                        digest=rpc_result.result_data.digest,
+                        reason=rpc_result.result_data.status
+                    )
             else:
                 return SuiTxResult(
                     address=str(sui_config.active_address),
-                    digest=rpc_result.result_data.digest,
-                    reason=rpc_result.result_data.status
+                    digest='',
+                    reason=str(rpc_result.result_string)
                 )
         except Exception as e:
-            pass
+            logger.exception(e)
 
 
 def execute_move_tx(sui_config: SuiConfig, game_id: str, move: Arrow) -> Sui8192MoveResult:
@@ -182,12 +191,11 @@ def merge_sui_coins_tx(sui_config: SuiConfig):
     transaction = init_transaction(sui_config=sui_config, merge_gas_budget=False)
 
     zero_coins, non_zero_coins = get_sui_coin_objects_for_merge(sui_config=sui_config)
-
-    if len(zero_coins) > 1:
+    if len(zero_coins):
         transaction.merge_coins(merge_to=non_zero_coins[0], merge_from=zero_coins)
         build_and_execute_tx(sui_config=sui_config, transaction=transaction)
-        _, non_zero_coins = get_sui_coin_objects_for_merge(sui_config=sui_config)
 
+    zero_coins, non_zero_coins = get_sui_coin_objects_for_merge(sui_config=sui_config)
     if len(non_zero_coins) > 1:
         transaction.merge_coins(merge_to=transaction.gas, merge_from=non_zero_coins[1:])
         return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
