@@ -166,9 +166,9 @@ def merge_sui_coins(sui_config: SuiConfig):
         result = merge_sui_coins_tx(sui_config=sui_config)
         if result:
             if result.reason:
-                logger.warning(f'{short_address(result.address)} | COIN_MERGE | digest: {result.digest} | '
+                logger.warning(f'{short_address(result.address)} | MERGE | digest: {result.digest} | '
                                f'reason: {result.reason}.')
             else:
-                logger.info(f'{short_address(result.address)} | COIN_MERGE | digest: {result.digest}')
-    except Exception as e:
-        logger.exception(e)
+                logger.info(f'{short_address(result.address)} | MERGE | digest: {result.digest}')
+    except:
+        pass
