@@ -21,7 +21,7 @@ from data import (SUI_DEFAULT_DERIVATION_PATH,
                   GAME_8192_MINT_GAME_ADDRESS,
                   SUI_NATIVE_DENOMINATION,
                   GAME_COINFLIP_ARG5,
-                  GAME_COINFLIP_TARGET)
+                  GAME_COINFLIP_TARGET, GAME_JOURNEY_TARGET, GAME_JOURNEY_ARG0)
 from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide, SuiBalance
 from utils.other_tools import short_address
 
@@ -63,7 +63,7 @@ def init_transaction(sui_config: SuiConfig, merge_gas_budget: bool = False) -> S
 
 
 def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction) -> SuiTxResult:
-    rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
+    # rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
 
     build = transaction.inspect_all()
     if build.error:
@@ -175,6 +175,25 @@ def play_coinflip_tx(sui_config: SuiConfig,
             SuiArray([SuiInteger(random.randint(0, 255)) for _ in range(16)]),
             split,
             ObjectID(GAME_COINFLIP_ARG5),
+        ]
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
+
+
+def create_profile(sui_config: SuiConfig,
+                   nickname: str,
+                   img_url: str,
+                   description: str) -> SuiTxResult:
+    transaction = init_transaction(sui_config=sui_config)
+
+    transaction.move_call(
+        target=SuiString(GAME_JOURNEY_TARGET),
+        arguments=[
+            ObjectID(GAME_JOURNEY_ARG0),
+            SuiString(nickname),
+            SuiString(' '),
+            SuiString(' '),
+            SuiString('')
         ]
     )
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
