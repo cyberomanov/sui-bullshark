@@ -21,7 +21,7 @@ from data import (SUI_DEFAULT_DERIVATION_PATH,
                   GAME_8192_MINT_GAME_ADDRESS,
                   SUI_NATIVE_DENOMINATION,
                   GAME_COINFLIP_ARG5,
-                  GAME_COINFLIP_TARGET, GAME_JOURNEY_TARGET, GAME_JOURNEY_ARG0)
+                  GAME_COINFLIP_TARGET, GAME_JOURNEY_TARGET, GAME_JOURNEY_ARG0, SAVE_QUEST_TARGET)
 from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide, SuiBalance
 from utils.other_tools import short_address
 
@@ -63,8 +63,6 @@ def init_transaction(sui_config: SuiConfig, merge_gas_budget: bool = False) -> S
 
 
 def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction) -> SuiTxResult:
-    # rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
-
     build = transaction.inspect_all()
     if build.error:
         return SuiTxResult(
@@ -191,9 +189,30 @@ def create_profile(sui_config: SuiConfig,
         arguments=[
             ObjectID(GAME_JOURNEY_ARG0),
             SuiString(nickname),
-            SuiString(' '),
-            SuiString(' '),
+            SuiString(img_url),
+            SuiString(description),
             SuiString('')
+        ]
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
+
+
+def save_quest(sui_config: SuiConfig,
+               profile_addr: str) -> SuiTxResult:
+    transaction = init_transaction(sui_config=sui_config)
+
+    t1 = random.randint(3500, 4500)
+    t2 = t1 + random.randint(100, 500)
+    random_dict = '{' + f'"ch":0,"c1":{random.randint(5, 6)},"t1":{t1},"c2":25,"t2":{t2}' + '}'
+
+    transaction.move_call(
+        target=SuiString(SAVE_QUEST_TARGET),
+        arguments=[
+            ObjectID(profile_addr),
+            SuiString('Polymedia: Early Adopter'),
+            SuiString('https://journey.polymedia.app/img/card_explorer.webp'),
+            SuiString('The door to the invisible must be visible'),
+            random_dict
         ]
     )
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
@@ -207,10 +226,10 @@ def get_sui_coin_objects_for_merge(sui_config: SuiConfig):
 
 
 def merge_sui_coins_tx(sui_config: SuiConfig):
-    transaction = init_transaction(sui_config=sui_config, merge_gas_budget=False)
+    transaction = init_transaction(sui_config=sui_config, merge_gas_budget=True)
 
     zero_coins, non_zero_coins = get_sui_coin_objects_for_merge(sui_config=sui_config)
-    if len(zero_coins):
+    if len(zero_coins) and len(non_zero_coins) > 1:
         transaction.merge_coins(merge_to=non_zero_coins[0], merge_from=zero_coins)
         build_and_execute_tx(sui_config=sui_config, transaction=transaction)
 

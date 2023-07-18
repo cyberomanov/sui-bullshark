@@ -47,7 +47,7 @@ def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_
                 else:
                     logger.error(
                         f'{short_address(result.address)} | {coinflip_side.name} | '
-                        f'reason: {result.reason} | sleep: {sleep}s.')
+                        f'reason: {result.reason}.')
             else:
                 sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
                 logger.info(f'{short_address(result.address)} | {coinflip_side.name} | digest: {result.digest} | '
