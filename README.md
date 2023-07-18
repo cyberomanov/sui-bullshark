@@ -10,7 +10,7 @@ this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) and [coinflip](
 1. make sure you have installed `python3.10` or newer.
 2. setup your `config.py` and `data/mnemonic.txt`;
 3. install requirements `pip3 install -r requirements.txt`
-4. run the script `python3 8192.py` to play **8192** or `python3 coinflip.py` to play **coinflip**.
+4. run the script `python3 8192.py` to play **8192** or `python3 coinflip.py` to play **coinflip** or `python3 journey.py` to play **journey**.
 ```bash
 18:00:09 | INFO | loaded addresses:
 18:00:09 | INFO | -------------
@@ -42,9 +42,15 @@ this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) and [coinflip](
 18:30:57 | INFO | 0xe1a0...b61e | sleep: 75s.
 18:32:12 | SUCCESS | 0xe1a0...b61e | has played 4 games.
 ```
-
+```bash
+17:33:36 | INFO | loaded addresses for journey:
+17:33:51 | INFO | 0xe851...71ad | create_profile | digest: 8w18R8KzvuLgfoVrsgBEvtb8ME4dF9Uj4ksBU82sXvUG | sleep: 14s.
+17:33:53 | INFO | 0xeb61...7275 | create_profile | digest: CiicAxu1xj4YHoKzitTsgN1otC75hdGnKQzRKT4ZcHUB | sleep: 9s.
+17:34:08 | INFO | 0xeb61...7275 | save_quest | digest: 8qdLBNi1y8GYfnbSfSrCsUqUh4qFGc9rkPsBgjYA7VUc | sleep: 12s.
+17:34:11 | INFO | 0xe851...71ad | save_quest | digest: 8F2dGi5MZLpu7cXwtp4BmRYJFe6mYpMWhfkzUFuho1tF | sleep: 10s.
+```
 ## Update
 1. `cd sui-bullshark`
 2. `git fetch && git reset --hard && git pull`
 3. `pip3 install -r requirements.txt`
-4. `python3 8192.py` | `python3 coinflip.py`
+4. `python3 8192.py` | `python3 coinflip.py` | `python journey.py`
