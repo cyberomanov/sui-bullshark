@@ -21,7 +21,8 @@ from utils import (add_logger,
                    get_active_game_ids,
                    get_sui_object_response,
                    merge_sui_coins,
-                   get_sui_balance)
+                   get_sui_balance,
+                   print_rank_and_balance)
 
 
 def main_play_game(sui_config: SuiConfig, game_id: str):
@@ -112,12 +113,8 @@ if __name__ == '__main__':
         sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
 
         logger.info('loaded addresses for 8192 game:')
-        logger.info('-' * 80)
-
         for sui_config in sui_configs:
-            logger.info(f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI.')
-
-        logger.info('-' * 80)
+            print_rank_and_balance(sui_config=sui_config)
 
         pool_executor(sui_configs=sui_configs)
     except Exception as e:

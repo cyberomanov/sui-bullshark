@@ -23,7 +23,7 @@ from data import (SUI_DEFAULT_DERIVATION_PATH,
                   GAME_COINFLIP_ARG5,
                   GAME_COINFLIP_TARGET)
 from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide, SuiBalance
-from utils import short_address
+from utils.other_tools import short_address
 
 
 def get_list_of_sui_configs(mnemonics: list[str]) -> list[SuiConfig]:

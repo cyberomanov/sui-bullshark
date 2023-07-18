@@ -4,9 +4,15 @@ import time
 
 import requests
 from loguru import logger
+from pysui import SuiConfig
 
 from config import sui_rpc
-from datatypes import ExplorerResponse, ExplorerBodyResult, ExplorerSuiCoinsResponse
+from datatypes import (ExplorerResponse,
+                       ExplorerBodyResult,
+                       ExplorerSuiCoinsResponse,
+                       PointRankResponse,
+                       PointRankResult)
+from utils.sui import get_sui_balance
 
 
 def get_sui_owned_objects_response(address: str) -> ExplorerResponse:
@@ -149,3 +155,44 @@ def get_sui_coin_objects(address: str):
         return ExplorerSuiCoinsResponse.parse_obj(json.loads(response.content))
     else:
         logger.error(json.loads(response.content))
+
+
+def get_points_and_rank(address: str):
+    url = f"https://quests.mystenlabs.com/api/trpc/user?" \
+          f"batch=1&" \
+          f"input=%7B%220%22%3A%7B%22address%22%3A%22{address}%22%7D%7D"
+
+    response = requests.get(url=url)
+    if response.status_code == 200:
+        return PointRankResponse.parse_obj(json.loads(response.content))
+    else:
+        logger.error(json.loads(response.content))
+
+
+def print_rank_and_balance(sui_config: SuiConfig):
+    rank: PointRankResult = get_points_and_rank(address=str(sui_config.active_address)).__root__[0]
+    rank_data = rank.result.data
+    if rank_data.position:
+        if rank_data.position < 10_000:
+            logger.success(
+                f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
+                f'8192: {rank_data.entry.numCommandsEthos8192}, '
+                f'miners: {rank_data.entry.numCommandsMiniMiners}, '
+                f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
+                f'#{rank_data.position}, score: {rank_data.entry.score}.')
+        else:
+            logger.info(
+                f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
+                f'8192: {rank_data.entry.numCommandsEthos8192}, '
+                f'miners: {rank_data.entry.numCommandsMiniMiners}, '
+                f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
+                f'#{rank_data.position}, score: {rank_data.entry.score}.')
+    else:
+        logger.warning(f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                       f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
+                       f'8192: {rank_data.entry.numCommandsEthos8192}, '
+                       f'miners: {rank_data.entry.numCommandsMiniMiners}, '
+                       f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
+                       f'score: {rank_data.entry.score}.')

@@ -97,3 +97,30 @@ class ExplorerSuiCoinsResponse(BaseModel):
 
 class ExplorerResponse(BaseModel):
     result: ExplorerResult
+
+
+class Entry(BaseModel):
+    bullsharkId: List[str]
+    score: int
+    numCommandsDeSuiFlip: int
+    numCommandsEthos8192: int
+    numCommandsJourneyToMountSogol: int
+    numCommandsMiniMiners: int
+    suspectedBot: bool
+
+
+class Data(BaseModel):
+    entry: Entry
+    position: Optional[int]
+
+
+class Result(BaseModel):
+    data: Data
+
+
+class PointRankResult(BaseModel):
+    result: Result
+
+
+class PointRankResponse(BaseModel):
+    __root__: List[PointRankResult]
