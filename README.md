@@ -1,6 +1,6 @@
 # SUI-8192
 
-this script plays in [sui8192](https://sui8192.ethoswallet.xyz/) and [coinflip](https://desuicoinflip.io/) for points in [quests](https://quests.mystenlabs.com/).<br>
+this script plays in [sui8192](https://sui8192.ethoswallet.xyz/), [coinflip](https://desuicoinflip.io/) and [journey](https://journey.polymedia.app/) for points in [quests](https://quests.mystenlabs.com/).<br>
 [donations are welcome](https://cyberomanov.tech/WTF_donate), if you find this tool helpful.
 
 ## Contents
