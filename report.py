@@ -18,8 +18,8 @@ if __name__ == '__main__':
             print(sui_config.active_address)
 
         logger.info('report:')
-        for sui_config in sui_configs:
-            print_rank_and_balance(sui_config=sui_config)
+        for num, sui_config in enumerate(sui_configs):
+            print_rank_and_balance(num=num, sui_config=sui_config)
             time.sleep(1)
 
     except Exception as e:

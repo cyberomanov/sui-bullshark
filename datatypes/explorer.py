@@ -115,7 +115,7 @@ class Data(BaseModel):
 
 
 class Result(BaseModel):
-    data: Data
+    data: Data | None
 
 
 class PointRankResult(BaseModel):

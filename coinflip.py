@@ -98,8 +98,8 @@ if __name__ == '__main__':
         sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
 
         logger.info('loaded addresses for coinflip game:')
-        for sui_config in sui_configs:
-            print_rank_and_balance(sui_config=sui_config)
+        for num, sui_config in enumerate(sui_configs):
+            print_rank_and_balance(num=num, sui_config=sui_config)
             time.sleep(1)
 
         pool_executor(sui_configs=sui_configs)

@@ -10,8 +10,7 @@ from config import sui_rpc
 from datatypes import (ExplorerResponse,
                        ExplorerBodyResult,
                        ExplorerSuiCoinsResponse,
-                       PointRankResponse,
-                       PointRankResult)
+                       PointRankResponse)
 from utils.sui import get_sui_balance
 
 
@@ -179,15 +178,17 @@ def get_points_and_rank(address: str):
             return False
 
 
-def print_rank_and_balance(sui_config: SuiConfig):
+def print_rank_and_balance(num: int, sui_config: SuiConfig):
+    num += 1
+
     rank = get_points_and_rank(address=str(sui_config.active_address))
-    if rank:
+    if rank.__root__[0].result.data:
         rank_data = rank.__root__[0].result.data
         if not rank_data.entry.suspectedBot:
             if rank_data.position:
                 if rank_data.position < 10_000:
                     logger.success(
-                        f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                        f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
                         f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
                         f'8192: {rank_data.entry.numCommandsEthos8192}, '
                         f'miners: {rank_data.entry.numCommandsMiniMiners}, '
@@ -195,26 +196,29 @@ def print_rank_and_balance(sui_config: SuiConfig):
                         f'#{rank_data.position}, score: {rank_data.entry.score}.')
                 else:
                     logger.info(
-                        f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                        f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
                         f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
                         f'8192: {rank_data.entry.numCommandsEthos8192}, '
                         f'miners: {rank_data.entry.numCommandsMiniMiners}, '
                         f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
                         f'#{rank_data.position}, score: {rank_data.entry.score}.')
             else:
-                logger.warning(f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-                               f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
-                               f'8192: {rank_data.entry.numCommandsEthos8192}, '
-                               f'miners: {rank_data.entry.numCommandsMiniMiners}, '
-                               f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
-                               f'score: {rank_data.entry.score}.')
+                logger.warning(
+                    f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                    f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
+                    f'8192: {rank_data.entry.numCommandsEthos8192}, '
+                    f'miners: {rank_data.entry.numCommandsMiniMiners}, '
+                    f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
+                    f'score: {rank_data.entry.score}.')
         else:
-            logger.warning(f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-                           f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
-                           f'8192: {rank_data.entry.numCommandsEthos8192}, '
-                           f'miners: {rank_data.entry.numCommandsMiniMiners}, '
-                           f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
-                           f'score: {rank_data.entry.score} | BOT.')
+            logger.warning(
+                f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                f'coinflip: {rank_data.entry.numCommandsDeSuiFlip}, '
+                f'8192: {rank_data.entry.numCommandsEthos8192}, '
+                f'miners: {rank_data.entry.numCommandsMiniMiners}, '
+                f'journey: {rank_data.entry.numCommandsJourneyToMountSogol} | '
+                f'score: {rank_data.entry.score} | BOT.')
     else:
-        logger.warning(f'{sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-                       f'bad rank response.')
+        logger.warning(
+            f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+            f'bad rank response.')
