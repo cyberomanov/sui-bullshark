@@ -100,6 +100,7 @@ if __name__ == '__main__':
         logger.info('loaded addresses for coinflip game:')
         for sui_config in sui_configs:
             print_rank_and_balance(sui_config=sui_config)
+            time.sleep(1)
 
         pool_executor(sui_configs=sui_configs)
     except Exception as e:

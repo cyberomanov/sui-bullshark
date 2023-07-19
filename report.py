@@ -1,3 +1,5 @@
+import time
+
 from loguru import logger
 
 from data import VERSION
@@ -18,6 +20,7 @@ if __name__ == '__main__':
         logger.info('report:')
         for sui_config in sui_configs:
             print_rank_and_balance(sui_config=sui_config)
+            time.sleep(1)
 
     except Exception as e:
         logger.exception(e)
