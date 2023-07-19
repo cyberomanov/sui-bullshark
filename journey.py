@@ -5,7 +5,6 @@ import time
 from loguru import logger
 from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
-from random_username.generate import generate_username
 
 from config import (sleep_range_between_txs_in_sec, start_threads_simultaneously)
 from data import VERSION, GAME_JOURNEY_MAIN_ADDRESS
@@ -16,7 +15,8 @@ from utils import (add_logger,
                    merge_sui_coins,
                    print_rank_and_balance,
                    create_profile,
-                   save_quest)
+                   save_quest, get_sui_balance)
+from utils.other_tools import get_random_username
 
 
 def main_create_profile(sui_config: SuiConfig, nickname: str, img_url: str = '', description: str = ''):
@@ -83,19 +83,21 @@ def single_executor(sui_config: SuiConfig):
         time.sleep(random.randint(1, 60))
 
     client = SuiClient(config=sui_config)
-
-    profile_objects = [item for item in list(client.get_objects().result_data.data) if
-                       item.object_type == f'{GAME_JOURNEY_MAIN_ADDRESS}::profile::Profile']
-
-    if not len(profile_objects):
-        main_create_profile(sui_config=sui_config, nickname=generate_username(1)[0], img_url='', description='')
+    if get_sui_balance(sui_config=sui_config).int:
         profile_objects = [item for item in list(client.get_objects().result_data.data) if
                            item.object_type == f'{GAME_JOURNEY_MAIN_ADDRESS}::profile::Profile']
-    else:
-        logger.info(f'{short_address(str(sui_config.active_address))} | profile is already created.')
 
-    if profile_objects:
-        main_save_quest(sui_config=sui_config, profile_addr=profile_objects[0].object_id)
+        if not len(profile_objects):
+            main_create_profile(sui_config=sui_config, nickname=get_random_username(), img_url='', description='')
+            profile_objects = [item for item in list(client.get_objects().result_data.data) if
+                               item.object_type == f'{GAME_JOURNEY_MAIN_ADDRESS}::profile::Profile']
+        else:
+            logger.info(f'{short_address(str(sui_config.active_address))} | profile is already created.')
+
+        if profile_objects:
+            main_save_quest(sui_config=sui_config, profile_addr=profile_objects[0].object_id)
+    else:
+        logger.warning(f'{short_address(str(sui_config.active_address))} | zero_balance.')
 
 
 def pool_executor(sui_configs: list[SuiConfig]):

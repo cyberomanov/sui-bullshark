@@ -41,17 +41,29 @@ def get_list_of_sui_configs(mnemonics: list[str]) -> list[SuiConfig]:
 
 
 def get_sui_balance(sui_config: SuiConfig) -> SuiBalance:
-    client = SuiClient(config=sui_config)
-    sui_coin_objects: SuiCoinObjects = client.get_gas().result_data
+    tries = 0
+    while True:
+        tries += 1
+        try:
+            client = SuiClient(config=sui_config)
+            sui_coin_objects: SuiCoinObjects = client.get_gas().result_data
 
-    balance = 0
-    for obj in list(sui_coin_objects.data):
-        balance += int(obj.balance)
+            balance = 0
+            for obj in list(sui_coin_objects.data):
+                balance += int(obj.balance)
 
-    return SuiBalance(
-        int=balance,
-        float=round(balance / 10 ** SUI_NATIVE_DENOMINATION, 2)
-    )
+            return SuiBalance(
+                int=balance,
+                float=round(balance / 10 ** SUI_NATIVE_DENOMINATION, 2)
+            )
+        except:
+            if tries <= 3:
+                time.sleep(3)
+            else:
+                return SuiBalance(
+                    int=0,
+                    float=0
+                )
 
 
 def init_transaction(sui_config: SuiConfig, merge_gas_budget: bool = False) -> SyncTransaction:

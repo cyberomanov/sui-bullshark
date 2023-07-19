@@ -162,11 +162,14 @@ def get_points_and_rank(address: str):
           f"batch=1&" \
           f"input=%7B%220%22%3A%7B%22address%22%3A%22{address}%22%7D%7D"
 
-    response = requests.get(url=url)
-    if response.status_code == 200:
-        return PointRankResponse.parse_obj(json.loads(response.content))
-    else:
-        logger.error(json.loads(response.content))
+    try:
+        response = requests.get(url=url)
+        if response.status_code == 200:
+            return PointRankResponse.parse_obj(json.loads(response.content))
+        else:
+            logger.error(json.loads(response.content))
+    except Exception as e:
+        logger.exception(e)
 
 
 def print_rank_and_balance(sui_config: SuiConfig):
