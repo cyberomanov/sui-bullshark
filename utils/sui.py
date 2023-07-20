@@ -286,12 +286,15 @@ def merge_sui_coins_tx(sui_config: SuiConfig):
 def merge_sui_coins(sui_config: SuiConfig):
     try:
         results = merge_sui_coins_tx(sui_config=sui_config)
-        for result in results:
-            if result:
-                if result.reason:
-                    logger.warning(f'{short_address(result.address)} | MERGE | digest: {result.digest} | '
-                                   f'reason: {result.reason}.')
-                else:
-                    logger.info(f'{short_address(result.address)} | MERGE | digest: {result.digest}.')
+        if results:
+            for result in results:
+                if result:
+                    if result.reason:
+                        logger.warning(f'{short_address(result.address)} | MERGE | digest: {result.digest} | '
+                                       f'reason: {result.reason}.')
+                    else:
+                        logger.info(f'{short_address(result.address)} | MERGE | digest: {result.digest}.')
+        else:
+            logger.info(f'{short_address(str(sui_config.active_address))} | nothing to merge.')
     except:
         pass

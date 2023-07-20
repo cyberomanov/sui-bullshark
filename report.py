@@ -16,8 +16,8 @@ if __name__ == '__main__':
 
         for sui_config in sui_configs:
             print(sui_config.active_address)
+        print()
 
-        logger.info('report:')
         for num, sui_config in enumerate(sui_configs):
             print_rank_and_balance(num=num, sui_config=sui_config)
             time.sleep(1)
