@@ -21,8 +21,6 @@ from utils.other_tools import get_random_username
 
 def main_create_profile(sui_config: SuiConfig, nickname: str, img_url: str = '', description: str = ''):
     try:
-
-        merge_sui_coins(sui_config=sui_config)
         result = create_profile(sui_config=sui_config,
                                 nickname=nickname,
                                 img_url=img_url,
@@ -81,6 +79,8 @@ def main_save_quest(sui_config: SuiConfig, profile_addr: str):
 def single_executor(sui_config: SuiConfig):
     if not start_threads_simultaneously:
         time.sleep(random.randint(1, 60))
+
+    merge_sui_coins(sui_config=sui_config)
 
     client = SuiClient(config=sui_config)
     if get_sui_balance(sui_config=sui_config).int:

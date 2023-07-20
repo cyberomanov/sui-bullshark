@@ -68,6 +68,8 @@ def single_executor(sui_config: SuiConfig):
     if not start_threads_simultaneously:
         time.sleep(random.randint(1, 60))
 
+    merge_sui_coins(sui_config=sui_config)
+
     played_games = get_game_items_count(address=str(sui_config.active_address))
     games_per_address = random.randint(total_max_8192_games_per_address_in_range[0],
                                        total_max_8192_games_per_address_in_range[1])
@@ -76,7 +78,6 @@ def single_executor(sui_config: SuiConfig):
         active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
 
         if not active_game_8192_ids:
-            merge_sui_coins(sui_config=sui_config)
             balance = get_sui_balance(sui_config=sui_config)
             if balance.float > 0.2:
                 main_mint_game(sui_config=sui_config)
@@ -85,7 +86,7 @@ def single_executor(sui_config: SuiConfig):
             else:
                 logger.info(f'{short_address(str(sui_config.active_address))} | '
                             f'balance is not enough: {balance.float} $SUI. '
-                            f'minimum required: {round(GAME_8192_MINT_PRICE / SUI_NATIVE_DENOMINATION, 2)} $SUI.')
+                            f'minimum required: {round(GAME_8192_MINT_PRICE / 10 ** SUI_NATIVE_DENOMINATION, 2)} $SUI.')
                 break
 
         active_game_8192_ids = get_active_game_ids(address=str(sui_config.active_address))
