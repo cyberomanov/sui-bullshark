@@ -106,7 +106,7 @@ class Entry(BaseModel):
     numCommandsEthos8192: int
     numCommandsJourneyToMountSogol: int
     numCommandsMiniMiners: int
-    suspectedBot: bool
+    bot: bool
 
 
 class Data(BaseModel):
