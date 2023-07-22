@@ -99,6 +99,8 @@ def single_executor(sui_config: SuiConfig):
             logger.info(f'{short_address(str(sui_config.active_address))} | sleep: {sleep}s.')
             time.sleep(sleep)
 
+        played_games = get_game_items_count(address=str(sui_config.active_address))
+
     logger.success(f'{short_address(str(sui_config.active_address))} | has played {played_games} games.')
 
 
