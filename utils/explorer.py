@@ -185,7 +185,7 @@ def print_rank_and_balance(num: int, sui_config: SuiConfig):
     if rank.__root__[0].result.data:
         rank_data = rank.__root__[0].result.data
         played_games = get_game_items_count(address=str(sui_config.active_address))
-        if not rank_data.entry.suspectedBot:
+        if not rank_data.entry.bot:
             if rank_data.position:
                 if rank_data.position < 10_000:
                     logger.success(
