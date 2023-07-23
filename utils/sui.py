@@ -29,26 +29,38 @@ from utils.other_tools import short_address
 def get_list_of_sui_configs(mnemonics: list[str], check_derivation_paths: bool = False) -> list[SuiConfig]:
     list_of_sui_configs = []
 
+    if check_derivation_paths:
+        logger.info("collecting 'sui_configs' with checking derivation path, it may take some time.")
+
     for mnemonic in mnemonics:
         if check_derivation_paths:
             index = 0
+            tries = 0
             while True:
-                sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
-                default_derivation_path = f"m/44'/784'/{index}'/0'/0'"
+                tries += 1
+                try:
+                    sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
+                    default_derivation_path = f"m/44'/784'/{index}'/0'/0'"
 
-                sui_config.recover_keypair_and_address(
-                    scheme=SignatureScheme.ED25519,
-                    mnemonics=mnemonic,
-                    derivation_path=default_derivation_path
-                )
-                sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
+                    sui_config.recover_keypair_and_address(
+                        scheme=SignatureScheme.ED25519,
+                        mnemonics=mnemonic,
+                        derivation_path=default_derivation_path
+                    )
+                    sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
 
-                objects = SuiClient(config=sui_config).get_objects()
-                if len(list(objects.result_data.data)):
-                    list_of_sui_configs.append(sui_config)
-                    index += 1
-                else:
-                    break
+                    objects = SuiClient(config=sui_config).get_objects()
+                    if len(list(objects.result_data.data)):
+                        list_of_sui_configs.append(sui_config)
+                        index += 1
+                    else:
+                        break
+                except:
+                    if tries > 3:
+                        break
+                    else:
+                        pass
+
         else:
             sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
             sui_config.recover_keypair_and_address(
@@ -58,6 +70,10 @@ def get_list_of_sui_configs(mnemonics: list[str], check_derivation_paths: bool =
             )
             sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
             list_of_sui_configs.append(sui_config)
+
+    if check_derivation_paths:
+        logger.info(f"{len(list_of_sui_configs)} non-empty wallets has been found from {len(mnemonics)} mnemonics.")
+
     return list_of_sui_configs
 
 
