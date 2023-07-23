@@ -26,17 +26,38 @@ from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide, SuiBa
 from utils.other_tools import short_address
 
 
-def get_list_of_sui_configs(mnemonics: list[str]) -> list[SuiConfig]:
+def get_list_of_sui_configs(mnemonics: list[str], check_derivation_paths: bool = False) -> list[SuiConfig]:
     list_of_sui_configs = []
+
     for mnemonic in mnemonics:
-        sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
-        sui_config.recover_keypair_and_address(
-            scheme=SignatureScheme.ED25519,
-            mnemonics=mnemonic,
-            derivation_path=SUI_DEFAULT_DERIVATION_PATH
-        )
-        sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
-        list_of_sui_configs.append(sui_config)
+        if check_derivation_paths:
+            index = 0
+            while True:
+                sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
+                default_derivation_path = f"m/44'/784'/{index}'/0'/0'"
+
+                sui_config.recover_keypair_and_address(
+                    scheme=SignatureScheme.ED25519,
+                    mnemonics=mnemonic,
+                    derivation_path=default_derivation_path
+                )
+                sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
+
+                objects = SuiClient(config=sui_config).get_objects()
+                if len(list(objects.result_data.data)):
+                    list_of_sui_configs.append(sui_config)
+                    index += 1
+                else:
+                    break
+        else:
+            sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
+            sui_config.recover_keypair_and_address(
+                scheme=SignatureScheme.ED25519,
+                mnemonics=mnemonic,
+                derivation_path=SUI_DEFAULT_DERIVATION_PATH
+            )
+            sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
+            list_of_sui_configs.append(sui_config)
     return list_of_sui_configs
 
 

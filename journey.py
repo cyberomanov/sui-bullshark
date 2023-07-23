@@ -6,16 +6,16 @@ from loguru import logger
 from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
 
-from config import (sleep_range_between_txs_in_sec, start_threads_simultaneously)
+from config import (sleep_range_between_txs_in_sec, start_threads_simultaneously, check_derivation_paths)
 from data import VERSION, GAME_JOURNEY_MAIN_ADDRESS
 from utils import (add_logger,
                    read_mnemonics,
                    get_list_of_sui_configs,
                    short_address,
                    merge_sui_coins,
-                   print_rank_and_balance,
                    create_profile,
-                   save_quest, get_sui_balance)
+                   save_quest,
+                   get_sui_balance)
 from utils.other_tools import get_random_username
 
 
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     add_logger(version=VERSION)
     try:
         mnemonics = read_mnemonics()
-        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
+        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics, check_derivation_paths=check_derivation_paths)
         pool_executor(sui_configs=sui_configs)
     except Exception as e:
         logger.exception(e)

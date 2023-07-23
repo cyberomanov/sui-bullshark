@@ -8,7 +8,8 @@ from pysui.sui.sui_config import SuiConfig
 from config import (total_max_8192_games_per_address_in_range,
                     sleep_range_between_txs_in_sec,
                     sleep_range_between_games_in_sec,
-                    start_threads_simultaneously)
+                    start_threads_simultaneously,
+                    check_derivation_paths)
 from data import VERSION, SUI_NATIVE_DENOMINATION, GAME_8192_MINT_PRICE
 from datatypes import Arrow
 from utils import (add_logger,
@@ -113,7 +114,7 @@ if __name__ == '__main__':
     add_logger(version=VERSION)
     try:
         mnemonics = read_mnemonics()
-        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
+        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics, check_derivation_paths=check_derivation_paths)
         pool_executor(sui_configs=sui_configs)
     except Exception as e:
         logger.exception(e)

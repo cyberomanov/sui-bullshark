@@ -8,7 +8,8 @@ from pysui.sui.sui_config import SuiConfig
 from config import (max_flip_count_per_session_in_range,
                     flip_bet_variants_in_sui,
                     sleep_range_between_txs_in_sec,
-                    start_threads_simultaneously)
+                    start_threads_simultaneously,
+                    check_derivation_paths)
 from data import VERSION
 from datatypes import CoinflipSide
 from utils import (add_logger,
@@ -19,8 +20,7 @@ from utils import (add_logger,
                    get_associated_kiosk,
                    get_bullshark_id,
                    merge_sui_coins,
-                   get_sui_balance,
-                   print_rank_and_balance)
+                   get_sui_balance)
 
 
 def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_addr: str):
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     add_logger(version=VERSION)
     try:
         mnemonics = read_mnemonics()
-        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
+        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics, check_derivation_paths=check_derivation_paths)
         pool_executor(sui_configs=sui_configs)
     except Exception as e:
         logger.exception(e)
