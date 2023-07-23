@@ -10,4 +10,4 @@ sui_rpc = "https://sui-rpc-mainnet.testnet-pride.com/"
 sleep_range_between_txs_in_sec = (10, 20)
 sleep_range_between_games_in_sec = (60, 180)
 start_threads_simultaneously = False
-check_derivation_paths = True
+check_derivation_paths = False
