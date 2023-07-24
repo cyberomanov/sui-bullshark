@@ -26,9 +26,10 @@ from utils import (add_logger,
 
 def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_addr: str):
     try:
-        bet_amount = random.choice(flip_bet_variants_in_sui)
+        merge_sui_coins(sui_config=sui_config)
         balance = get_sui_balance(sui_config=sui_config)
 
+        bet_amount = random.choice(flip_bet_variants_in_sui)
         if balance.float > bet_amount:
             coinflip_side = random.choice(list(CoinflipSide))
 
@@ -66,8 +67,6 @@ def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_
 def single_executor(sui_config: SuiConfig):
     if not start_threads_simultaneously:
         time.sleep(random.randint(1, 60))
-
-    merge_sui_coins(sui_config=sui_config)
 
     associated_kiosk_addr = get_associated_kiosk(address=str(sui_config.active_address))
     kiosk_dynamic_fields = get_bullshark_id(kiosk_addr=associated_kiosk_addr).result.data

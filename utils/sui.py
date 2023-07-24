@@ -224,7 +224,7 @@ def play_coinflip_tx(sui_config: SuiConfig,
             ObjectID(associated_kiosk_addr),
             SuiAddress(bullshark_addr),
             SuiU8(coinflip_side.value),
-            SuiArray([SuiInteger(random.randint(0, 255)) for _ in range(16)]),
+            SuiArray([SuiInteger(random.randint(1, 255)) for _ in range(16)]),
             split,
             ObjectID(GAME_COINFLIP_ARG5),
         ]
