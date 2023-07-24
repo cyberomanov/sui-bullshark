@@ -3,6 +3,7 @@ import random
 import time
 
 from loguru import logger
+from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
 
 from config import (max_flip_count_per_session_in_range,
@@ -69,7 +70,12 @@ def single_executor(sui_config: SuiConfig):
     merge_sui_coins(sui_config=sui_config)
 
     associated_kiosk_addr = get_associated_kiosk(address=str(sui_config.active_address))
-    bullshark_addr = get_bullshark_id(kiosk_addr=associated_kiosk_addr).result.data[0].objectId
+    kiosk_dynamic_fields = get_bullshark_id(kiosk_addr=associated_kiosk_addr).result.data
+
+    bullshark_addr = None
+    for field in kiosk_dynamic_fields:
+        if 'bullshark' in str(field.objectType).lower():
+            bullshark_addr = field.objectId
 
     flips_per_session = random.randint(max_flip_count_per_session_in_range[0], max_flip_count_per_session_in_range[1])
     broken = False

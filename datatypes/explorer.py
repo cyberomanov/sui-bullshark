@@ -67,6 +67,7 @@ class ExplorerDataResult(BaseModel):
     content: Optional[ExplorerContent]
     fields: Optional[Dict]
     type: Optional[str]
+    objectType: Optional[str]
 
 
 class ExplorerBodyResult(BaseModel):
