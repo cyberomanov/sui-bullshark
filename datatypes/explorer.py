@@ -100,19 +100,15 @@ class ExplorerResponse(BaseModel):
     result: ExplorerResult
 
 
-class Entry(BaseModel):
-    bullsharkId: List[str]
+class Data(BaseModel):
+    bullsharkId: list[str]
     score: int
+    bot: bool
+    rank: int
     numCommandsDeSuiFlip: int
     numCommandsEthos8192: int
     numCommandsJourneyToMountSogol: int
     numCommandsMiniMiners: int
-    bot: bool
-
-
-class Data(BaseModel):
-    entry: Entry
-    position: Optional[int]
 
 
 class Result(BaseModel):

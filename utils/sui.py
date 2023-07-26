@@ -95,7 +95,7 @@ def get_sui_balance(sui_config: SuiConfig) -> SuiBalance:
                 float=round(balance / 10 ** SUI_NATIVE_DENOMINATION, 2)
             )
         except:
-            if tries <= 3:
+            if tries <= 5:
                 time.sleep(3)
             else:
                 return SuiBalance(
