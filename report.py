@@ -32,8 +32,9 @@ if __name__ == '__main__':
 
         logger.info(f'top10k: {len(top10k)}/{len(address_reports)}, top5k: {len(top5k)}/{len(address_reports)}, '
                     f'others: {len(address_reports) - (len(top10k) + len(top5k))}/{len(address_reports)}.')
-        top10k_rewards = len(top10k) * 200
-        top5k_rewards = len(top5k) * 100
+
+        top10k_rewards = len(top10k) * 100
+        top5k_rewards = len(top5k) * 200
         other_rewards = (len(address_reports) - (len(top10k) + len(top5k))) * 20
 
         logger.info(f'expected rewards: {top10k_rewards} + {top5k_rewards} + '
