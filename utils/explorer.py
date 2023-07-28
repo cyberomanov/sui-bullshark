@@ -10,7 +10,7 @@ from config import sui_rpc
 from datatypes import (ExplorerResponse,
                        ExplorerBodyResult,
                        ExplorerSuiCoinsResponse,
-                       PointRankResponse)
+                       PointRankResponse, SuiAddressReport)
 from utils.sui import get_sui_balance
 
 
@@ -219,6 +219,12 @@ def print_rank_and_balance(num: int, sui_config: SuiConfig):
                 f'miners: {rank_data.numCommandsMiniMiners}, '
                 f'journey: {rank_data.numCommandsJourneyToMountSogol} | '
                 f'score: {rank_data.score} | BOT.')
+
+        return SuiAddressReport(
+            address=str(sui_config.active_address),
+            rank=rank_data.rank,
+            score=rank_data.score
+        )
     else:
         logger.error(
             f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '

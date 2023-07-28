@@ -121,3 +121,9 @@ class PointRankResult(BaseModel):
 
 class PointRankResponse(BaseModel):
     __root__: List[PointRankResult]
+
+
+class SuiAddressReport(BaseModel):
+    address: str
+    rank: int
+    score: int
