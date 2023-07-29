@@ -279,10 +279,6 @@ def get_sui_coin_objects_for_merge(sui_config: SuiConfig):
     non_zero_coins = [x for x in gas_coin_objects.data if int(x.balance) > 0]
 
     richest_coin = max(non_zero_coins, key=lambda x: int(x.balance), default=None)
-
-    if richest_coin:
-        non_zero_coins.remove(richest_coin)
-
     return zero_coins, non_zero_coins, richest_coin
 
 
@@ -304,8 +300,10 @@ def merge_sui_coins_tx(sui_config: SuiConfig):
             time.sleep(5)
         zero_coins, non_zero_coins, richest_coin = get_sui_coin_objects_for_merge(sui_config=sui_config)
 
-    if len(non_zero_coins):
+    if len(non_zero_coins) > 1:
         logger.info(f'{short_address(str(sui_config.active_address))} | trying to merge non_zero_coins.')
+        non_zero_coins.remove(richest_coin)
+
         transaction = init_transaction(sui_config=sui_config)
         transaction.merge_coins(merge_to=transaction.gas, merge_from=non_zero_coins)
         build_result = build_and_execute_tx(
