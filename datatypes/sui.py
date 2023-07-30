@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+from pysui import SuiConfig
 
 
 class Arrow(Enum):
@@ -33,3 +34,11 @@ class SuiTxResult(Sui8192TransactionResult):
 class SuiBalance(BaseModel):
     int: int
     float: float
+
+
+class SuiTransferConfig(BaseModel):
+    config: SuiConfig
+    address: str
+
+    class Config:
+        arbitrary_types_allowed = True
