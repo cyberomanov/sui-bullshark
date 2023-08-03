@@ -7,7 +7,6 @@ from pysui.sui.sui_clients.common import handle_result
 from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
 from pysui.sui.sui_txn import SyncTransaction
-from pysui.sui.sui_txresults import TxInspectionResult
 from pysui.sui.sui_txresults.single_tx import SuiCoinObjects
 from pysui.sui.sui_types import SuiString, SuiU64, ObjectID, SuiArray, SuiU8, SuiInteger
 from pysui.sui.sui_types.address import SuiAddress
@@ -168,8 +167,6 @@ def init_transaction(sui_config: SuiConfig, merge_gas_budget: bool = False) -> S
 
 def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction,
                          gas_object: ObjectID = None) -> SuiTxResult:
-    # rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
-
     build = transaction.inspect_all()
     if build.error:
         return SuiTxResult(
