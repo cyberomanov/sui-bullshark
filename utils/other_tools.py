@@ -4,7 +4,7 @@ import random
 import requests
 from random_username.generate import generate_username
 
-from data import SUI_NATIVE_DENOMINATION
+from data import SUI_NATIVE_DENOMINATION, TRANSFER_CRINGE_LIMIT
 from datatypes.nickname import NicknameResponse
 from datatypes.sui import SuiBalance
 
@@ -31,10 +31,16 @@ def get_random_username() -> str:
 
 def get_balance_to_transfer(balance: SuiBalance, value_to_leave_in_sui: float) -> SuiBalance:
     value_to_leave_in_sui_int = int(value_to_leave_in_sui * 10 ** SUI_NATIVE_DENOMINATION)
-
-    balance_to_transfer_float = round((balance.int - value_to_leave_in_sui_int) * 0.999 / 10 ** SUI_NATIVE_DENOMINATION,
-                                      random.randint(2, 4))
-    balance_to_transfer_int = int(balance_to_transfer_float * 10 ** SUI_NATIVE_DENOMINATION)
+    if balance.int > TRANSFER_CRINGE_LIMIT:
+        balance_to_transfer_float = round((TRANSFER_CRINGE_LIMIT - value_to_leave_in_sui_int) *
+                                          random.uniform(0.5, 0.99) / 10 ** SUI_NATIVE_DENOMINATION,
+                                          random.randint(2, 4))
+        balance_to_transfer_int = int(balance_to_transfer_float * 10 ** SUI_NATIVE_DENOMINATION)
+    else:
+        balance_to_transfer_float = round(
+            (balance.int - value_to_leave_in_sui_int) * 0.99 / 10 ** SUI_NATIVE_DENOMINATION,
+            random.randint(2, 4))
+        balance_to_transfer_int = int(balance_to_transfer_float * 10 ** SUI_NATIVE_DENOMINATION)
 
     return SuiBalance(
         int=balance_to_transfer_int,
