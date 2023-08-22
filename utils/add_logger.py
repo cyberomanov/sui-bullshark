@@ -16,7 +16,7 @@ def add_logger(log_output: str = LOG_OUTPUT, log_rotation: str = LOG_ROTATION, v
 
     print(
         "┌ ----------------------------------------------- ┐\n"
-        "|                  SUI-GAME  {sv}                 |\n"
+        "|                  SUI-QUEST {sv}                 |\n"
         "| ----------------------------------------------- |\n"
         "|            with love by @cyberomanov            |\n"
         "└ ----------------------------------------------- ┘".format(sv=version)

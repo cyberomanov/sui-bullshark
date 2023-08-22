@@ -3,20 +3,14 @@ import random
 import time
 
 from loguru import logger
-from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
 
 from config import (max_flip_count_per_session_in_range,
                     flip_bet_variants_in_sui,
-                    sleep_range_between_txs_in_sec,
-                    start_threads_simultaneously,
-                    check_derivation_paths)
-from data import VERSION
+                    short_sleep_between_txs_in_range_in_sec,
+                    start_threads_simultaneously)
 from datatypes import CoinflipSide
-from utils import (add_logger,
-                   read_mnemonics,
-                   get_list_of_sui_configs,
-                   short_address,
+from utils import (short_address,
                    play_coinflip_tx,
                    get_associated_kiosk,
                    get_bullshark_id,
@@ -41,7 +35,8 @@ def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_
             sleep = 0
             if result.reason:
                 if result.digest:
-                    sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+                    sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                           short_sleep_between_txs_in_range_in_sec[1])
                     logger.error(
                         f'{short_address(result.address)} | {coinflip_side.name} | digest: {result.digest} | '
                         f'reason: {result.reason} | sleep: {sleep}s.')
@@ -50,7 +45,8 @@ def main_play_game(sui_config: SuiConfig, associated_kiosk_addr: str, bullshark_
                         f'{short_address(result.address)} | {coinflip_side.name} | '
                         f'reason: {result.reason}.')
             else:
-                sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+                sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                       short_sleep_between_txs_in_range_in_sec[1])
                 logger.info(f'{short_address(result.address)} | {coinflip_side.name} | digest: {result.digest} | '
                             f'sleep: {sleep}s.')
 
@@ -92,18 +88,6 @@ def single_executor(sui_config: SuiConfig):
         logger.success(f'{short_address(str(sui_config.active_address))} | has played {flips_per_session} games.')
 
 
-def pool_executor(sui_configs: list[SuiConfig]):
+def main_coinflip_executor(sui_configs: list[SuiConfig]):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(single_executor, sui_configs)
-
-
-if __name__ == '__main__':
-    add_logger(version=VERSION)
-    try:
-        mnemonics = read_mnemonics()
-        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics, check_derivation_paths=check_derivation_paths)
-        pool_executor(sui_configs=sui_configs)
-    except Exception as e:
-        logger.exception(e)
-    except KeyboardInterrupt:
-        exit()

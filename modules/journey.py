@@ -6,15 +6,12 @@ from loguru import logger
 from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
 
-from config import (sleep_range_between_txs_in_sec, start_threads_simultaneously, check_derivation_paths)
-from data import VERSION, GAME_JOURNEY_MAIN_ADDRESS
-from utils import (add_logger,
-                   read_mnemonics,
-                   get_list_of_sui_configs,
-                   short_address,
+from config import (short_sleep_between_txs_in_range_in_sec, start_threads_simultaneously)
+from data import GAME_JOURNEY_MAIN_ADDRESS
+from utils import (short_address,
                    merge_sui_coins,
                    create_profile,
-                   save_quest,
+                   save_quest_tx,
                    get_sui_balance)
 from utils.other_tools import get_random_username
 
@@ -29,7 +26,8 @@ def main_create_profile(sui_config: SuiConfig, nickname: str, img_url: str = '',
         sleep = 0
         if result.reason:
             if result.digest:
-                sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+                sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                       short_sleep_between_txs_in_range_in_sec[1])
                 logger.error(
                     f'{short_address(result.address)} | create_profile | digest: {result.digest} | '
                     f'reason: {result.reason} | sleep: {sleep}s.')
@@ -38,7 +36,8 @@ def main_create_profile(sui_config: SuiConfig, nickname: str, img_url: str = '',
                     f'{short_address(result.address)} | create_profile | '
                     f'reason: {result.reason}.')
         else:
-            sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+            sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                   short_sleep_between_txs_in_range_in_sec[1])
             logger.info(f'{short_address(result.address)} | create_profile | digest: {result.digest} | '
                         f'sleep: {sleep}s.')
 
@@ -49,12 +48,13 @@ def main_create_profile(sui_config: SuiConfig, nickname: str, img_url: str = '',
 
 def main_save_quest(sui_config: SuiConfig, profile_addr: str):
     try:
-        result = save_quest(sui_config=sui_config, profile_addr=profile_addr)
+        result = save_quest_tx(sui_config=sui_config, profile_addr=profile_addr)
 
         sleep = 0
         if result.reason:
             if result.digest:
-                sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+                sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                       short_sleep_between_txs_in_range_in_sec[1])
                 logger.error(
                     f'{short_address(result.address)} | save_quest | digest: {result.digest} | '
                     f'reason: {result.reason} | sleep: {sleep}s.')
@@ -67,7 +67,8 @@ def main_save_quest(sui_config: SuiConfig, profile_addr: str):
                     logger.info(
                         f'{short_address(result.address)} | quest is already saved.')
         else:
-            sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+            sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                   short_sleep_between_txs_in_range_in_sec[1])
             logger.info(f'{short_address(result.address)} | save_quest | digest: {result.digest} | '
                         f'sleep: {sleep}s.')
 
@@ -100,18 +101,6 @@ def single_executor(sui_config: SuiConfig):
         logger.warning(f'{short_address(str(sui_config.active_address))} | zero_balance.')
 
 
-def pool_executor(sui_configs: list[SuiConfig]):
+def main_journey_executor(sui_configs: list[SuiConfig]):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(single_executor, sui_configs)
-
-
-if __name__ == '__main__':
-    add_logger(version=VERSION)
-    try:
-        mnemonics = read_mnemonics()
-        sui_configs = get_list_of_sui_configs(mnemonics=mnemonics, check_derivation_paths=check_derivation_paths)
-        pool_executor(sui_configs=sui_configs)
-    except Exception as e:
-        logger.exception(e)
-    except KeyboardInterrupt:
-        exit()

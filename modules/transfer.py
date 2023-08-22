@@ -4,21 +4,16 @@ import time
 from loguru import logger
 
 from config import (start_threads_simultaneously,
-                    check_derivation_paths,
-                    value_to_leave_in_sui, sleep_range_between_txs_in_sec)
-from data import VERSION
+                    value_to_leave_in_sui,
+                    short_sleep_between_txs_in_range_in_sec)
 from datatypes import SuiTransferConfig
-from utils import (add_logger,
-                   read_mnemonics,
-                   short_address,
-                   merge_sui_coins,
+from utils import (short_address,
                    get_sui_balance,
-                   get_list_of_transfer_configs,
                    get_balance_to_transfer,
                    transfer_sui_tx)
 
 
-def main_transfer(transfer_config: SuiTransferConfig):
+def main_transfer_executor(transfer_config: SuiTransferConfig):
     if not start_threads_simultaneously:
         time.sleep(random.randint(1, 60))
 
@@ -26,7 +21,7 @@ def main_transfer(transfer_config: SuiTransferConfig):
     recipient_address = transfer_config.address
 
     try:
-        merge_sui_coins(sui_config=sui_config)
+        # merge_sui_coins(sui_config=sui_config)
 
         at_least_one_swap = False
         while True:
@@ -36,15 +31,18 @@ def main_transfer(transfer_config: SuiTransferConfig):
             if balance.float > value_to_leave_in_float:
                 balance_to_transfer = get_balance_to_transfer(balance=balance,
                                                               value_to_leave_in_sui=value_to_leave_in_float)
-                if balance_to_transfer.float > 0.15:
+
+                if balance_to_transfer.float > 0.1:
                     at_least_one_swap = True
 
-                    result = transfer_sui_tx(sui_config=sui_config, recipient=recipient_address, amount=balance_to_transfer)
+                    result = transfer_sui_tx(sui_config=sui_config, recipient=recipient_address,
+                                             amount=balance_to_transfer)
 
                     sleep = 0
                     if result.reason:
                         if result.digest:
-                            sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+                            sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                                   short_sleep_between_txs_in_range_in_sec[1])
                             logger.error(
                                 f'{short_address(result.address)} -> {short_address(recipient_address)} | '
                                 f'transfer: {balance_to_transfer.float} $SUI | digest: {result.digest} | '
@@ -55,7 +53,8 @@ def main_transfer(transfer_config: SuiTransferConfig):
                                 f'transfer: {balance_to_transfer.float} $SUI | '
                                 f'reason: {result.reason}.')
                     else:
-                        sleep = random.randint(sleep_range_between_txs_in_sec[0], sleep_range_between_txs_in_sec[1])
+                        sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
+                                               short_sleep_between_txs_in_range_in_sec[1])
                         logger.info(
                             f'{short_address(result.address)} -> {short_address(recipient_address)} | '
                             f'transfer: {balance_to_transfer.float} $SUI | digest: {result.digest} | '
@@ -67,27 +66,15 @@ def main_transfer(transfer_config: SuiTransferConfig):
                         logger.warning(
                             f'{short_address(str(sui_config.active_address))} -> {short_address(recipient_address)} | '
                             f'balance is not enough: {balance.float} $SUI. '
-                            f'minimum value to leave: {round(value_to_leave_in_float + 0.15, 2)} $SUI.')
+                            f'minimum value to leave: {round(value_to_leave_in_float + 0.1, 2)} $SUI.')
                     break
             else:
                 if not at_least_one_swap:
-                    logger.warning(f'{short_address(str(sui_config.active_address))} -> {short_address(recipient_address)} | '
-                                   f'balance is not enough: {balance.float} $SUI. '
-                                   f'minimum value to leave: {value_to_leave_in_float} $SUI.')
+                    logger.warning(
+                        f'{short_address(str(sui_config.active_address))} -> {short_address(recipient_address)} | '
+                        f'balance is not enough: {balance.float} $SUI. '
+                        f'minimum value to leave: {value_to_leave_in_float} $SUI.')
                 break
 
-    except:
-        logger.exception(e)
-
-
-if __name__ == '__main__':
-    add_logger(version=VERSION)
-    try:
-        mnemonics = read_mnemonics(path='data/transfer.txt')
-        sui_configs = get_list_of_transfer_configs(mnemonics=mnemonics, check_derivation_paths=check_derivation_paths)
-        for config in sui_configs:
-            main_transfer(transfer_config=config)
     except Exception as e:
         logger.exception(e)
-    except KeyboardInterrupt:
-        exit()

@@ -159,7 +159,7 @@ def get_sui_coin_objects(address: str):
 def get_points_and_rank(address: str):
     url = f"https://quests.mystenlabs.com/api/trpc/user?" \
           f"batch=1&" \
-          f"input=%7B%220%22%3A%7B%22address%22%3A%22{address}%22%7D%7D"
+          f"input=%7B%220%22%3A%7B%22address%22%3A%22{address}%22%2C%22questId%22%3A2%7D%7D"
 
     tries = 0
     while True:
@@ -167,7 +167,10 @@ def get_points_and_rank(address: str):
             try:
                 response = requests.get(url=url)
                 if response.status_code == 200:
-                    return PointRankResponse.parse_obj(json.loads(response.content))
+                    try:
+                        return PointRankResponse.parse_obj(json.loads(response.content))
+                    except:
+                        return False
                 else:
                     tries += 1
                     logger.error(json.loads(response.content))
@@ -182,50 +185,65 @@ def print_rank_and_balance(num: int, sui_config: SuiConfig):
     num += 1
 
     rank = get_points_and_rank(address=str(sui_config.active_address))
-    if rank.__root__[0].result.data:
-        rank_data = rank.__root__[0].result.data
-        played_games = get_game_items_count(address=str(sui_config.active_address))
-        if not rank_data.bot:
-            if rank_data.rank:
-                if rank_data.rank < 10_000:
-                    logger.success(
-                        f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-                        f'coinflip: {rank_data.numCommandsDeSuiFlip}, '
-                        f'8192: {played_games}x{rank_data.numCommandsEthos8192}, '
-                        f'miners: {rank_data.numCommandsMiniMiners}, '
-                        f'journey: {rank_data.numCommandsJourneyToMountSogol} | '
-                        f'#{rank_data.rank}, score: {rank_data.score}.')
+    if rank:
+        if rank.__root__[0].result.data:
+            rank_data = rank.__root__[0].result.data
+            if not rank_data.bot:
+                if rank_data.rank:
+                    if rank_data.rank < 5_000:
+                        logger.success(
+                            f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                            f'sui_tvl: {round(rank_data.metadata.SUI_TVL, 1)}, '
+                            f'non_sui_tvl_in_usd: {round(rank_data.metadata.NON_SUI_TVL_IN_USD, 1)}, '
+                            f'navi: {rank_data.metadata.NAVI_VALUE}, '
+                            f'kriya: {rank_data.metadata.KRIYA_VALUE}, '
+                            f'scallop: {rank_data.metadata.SCALLOP_VALUE}, '
+                            f'turbos: {rank_data.metadata.TURBOS_VALUE}, '
+                            f'typus: {rank_data.metadata.TYPUS_VALUE} | '
+                            f'#{rank_data.rank}, score: {rank_data.score}.')
+                    else:
+                        logger.info(
+                            f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
+                            f'sui_tvl: {round(rank_data.metadata.SUI_TVL, 1)}, '
+                            f'non_sui_tvl_in_usd: {round(rank_data.metadata.NON_SUI_TVL_IN_USD, 1)}, '
+                            f'navi: {rank_data.metadata.NAVI_VALUE}, '
+                            f'kriya: {rank_data.metadata.KRIYA_VALUE}, '
+                            f'scallop: {rank_data.metadata.SCALLOP_VALUE}, '
+                            f'turbos: {rank_data.metadata.TURBOS_VALUE}, '
+                            f'typus: {rank_data.metadata.TYPUS_VALUE} | '
+                            f'#{rank_data.rank}, score: {rank_data.score}.')
                 else:
-                    logger.info(
+                    logger.warning(
                         f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-                        f'coinflip: {rank_data.numCommandsDeSuiFlip}, '
-                        f'8192: {played_games}x{rank_data.numCommandsEthos8192}, '
-                        f'miners: {rank_data.numCommandsMiniMiners}, '
-                        f'journey: {rank_data.numCommandsJourneyToMountSogol} | '
-                        f'#{rank_data.rank}, score: {rank_data.score}.')
+                        f'sui_tvl: {round(rank_data.metadata.SUI_TVL, 1)}, '
+                        f'non_sui_tvl_in_usd: {round(rank_data.metadata.NON_SUI_TVL_IN_USD, 1)}, '
+                        f'navi: {rank_data.metadata.NAVI_VALUE}, '
+                        f'kriya: {rank_data.metadata.KRIYA_VALUE}, '
+                        f'scallop: {rank_data.metadata.SCALLOP_VALUE}, '
+                        f'turbos: {rank_data.metadata.TURBOS_VALUE}, '
+                        f'typus: {rank_data.metadata.TYPUS_VALUE} | '
+                        f'score: {rank_data.score}.')
             else:
-                logger.warning(
+                logger.error(
                     f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-                    f'coinflip: {rank_data.numCommandsDeSuiFlip}, '
-                    f'8192: {played_games}x{rank_data.numCommandsEthos8192}, '
-                    f'miners: {rank_data.numCommandsMiniMiners}, '
-                    f'journey: {rank_data.numCommandsJourneyToMountSogol} | '
-                    f'score: {rank_data.score}.')
+                    f'sui_tvl: {round(rank_data.metadata.SUI_TVL, 1)}, '
+                    f'non_sui_tvl_in_usd: {round(rank_data.metadata.NON_SUI_TVL_IN_USD, 1)}, '
+                    f'navi: {rank_data.metadata.NAVI_VALUE}, '
+                    f'kriya: {rank_data.metadata.KRIYA_VALUE}, '
+                    f'scallop: {rank_data.metadata.SCALLOP_VALUE}, '
+                    f'turbos: {rank_data.metadata.TURBOS_VALUE}, '
+                    f'typus: {rank_data.metadata.TYPUS_VALUE} | '
+                    f'score: {rank_data.score} | BOT.')
+
+            return SuiAddressReport(
+                address=str(sui_config.active_address),
+                rank=rank_data.rank if rank_data.rank else 999_999_999,
+                score=rank_data.score
+            )
         else:
             logger.error(
                 f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-                f'coinflip: {rank_data.numCommandsDeSuiFlip}, '
-                f'8192: {played_games}x{rank_data.numCommandsEthos8192}, '
-                f'miners: {rank_data.numCommandsMiniMiners}, '
-                f'journey: {rank_data.numCommandsJourneyToMountSogol} | '
-                f'score: {rank_data.score} | BOT.')
-
-        return SuiAddressReport(
-            address=str(sui_config.active_address),
-            rank=rank_data.rank,
-            score=rank_data.score
-        )
+                f'bad rank response, the address may not has a bullshark nft.')
     else:
-        logger.error(
-            f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI | '
-            f'bad rank response, the address may not has a bullshark nft.')
+        logger.info(
+            f'#{num:>4} | {sui_config.active_address}: {get_sui_balance(sui_config=sui_config).float} $SUI.')

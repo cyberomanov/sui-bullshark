@@ -7,146 +7,90 @@ from pysui.sui.sui_clients.common import handle_result
 from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
 from pysui.sui.sui_txn import SyncTransaction
-from pysui.sui.sui_txresults.single_tx import SuiCoinObjects
+from pysui.sui.sui_txresults.single_tx import SuiCoinObjects, SuiCoinObject
 from pysui.sui.sui_types import SuiString, SuiU64, ObjectID, SuiArray, SuiU8, SuiInteger
 from pysui.sui.sui_types.address import SuiAddress
 from pysui.sui.sui_types.bcs import Argument
 
 from config import sui_rpc
-from data import (SUI_DEFAULT_DERIVATION_PATH,
-                  GAME_8192_MAKE_MOVE_TARGET,
-                  SUI_GAS_BUDGET,
-                  GAME_8192_MINT_PRICE,
-                  GAME_8192_CREATE_TARGET,
-                  GAME_8192_MINT_GAME_ADDRESS,
-                  SUI_NATIVE_DENOMINATION,
-                  GAME_COINFLIP_ARG5,
-                  GAME_COINFLIP_TARGET, GAME_JOURNEY_TARGET, GAME_JOURNEY_ARG0, SAVE_QUEST_TARGET)
-from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide, SuiBalance, SuiTransferConfig
+from data import *
+from datatypes import Arrow, Sui8192MoveResult, SuiTxResult, CoinflipSide, SuiBalance, SuiTransferConfig, SuiTx
 from utils.other_tools import short_address
 
 
-def get_list_of_sui_configs(mnemonics: list[str], check_derivation_paths: bool = False) -> list[SuiConfig]:
+def get_list_of_sui_configs(mnemonics: list[str]) -> list[SuiConfig]:
     list_of_sui_configs = []
 
-    if check_derivation_paths:
-        logger.info("collecting 'sui_configs' with checking derivation path, it may take some time.")
-
     for mnemonic in mnemonics:
-        if check_derivation_paths:
-            index = 0
-            tries = 0
-            while True:
-                tries += 1
-                try:
-                    sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
-                    default_derivation_path = f"m/44'/784'/{index}'/0'/0'"
-
-                    sui_config.recover_keypair_and_address(
-                        scheme=SignatureScheme.ED25519,
-                        mnemonics=mnemonic,
-                        derivation_path=default_derivation_path
-                    )
-                    sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
-
-                    objects = SuiClient(config=sui_config).get_objects()
-                    if len(list(objects.result_data.data)):
-                        list_of_sui_configs.append(sui_config)
-                        index += 1
-                    else:
-                        break
-                except:
-                    if tries > 3:
-                        break
-                    else:
-                        pass
-
+        sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
+        if '0x' in mnemonic:
+            sui_config.add_keypair_from_keystring(keystring={
+                'wallet_key': mnemonic,
+                'key_scheme': SignatureScheme.ED25519
+            })
         else:
-            sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
             sui_config.recover_keypair_and_address(
                 scheme=SignatureScheme.ED25519,
                 mnemonics=mnemonic,
                 derivation_path=SUI_DEFAULT_DERIVATION_PATH
             )
-            sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
-            list_of_sui_configs.append(sui_config)
-
-    if check_derivation_paths:
-        logger.info(f"{len(list_of_sui_configs)} non-empty wallets has been found from {len(mnemonics)} mnemonics.")
+        sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
+        list_of_sui_configs.append(sui_config)
 
     return list_of_sui_configs
 
 
-def get_list_of_transfer_configs(mnemonics: list[str], check_derivation_paths: bool = False) -> list[SuiTransferConfig]:
+def get_list_of_transfer_configs(mnemonics: list[str]) -> list[SuiTransferConfig]:
     list_of_sui_configs = []
-
-    if check_derivation_paths:
-        logger.info("collecting 'sui_configs' with checking derivation path, it may take some time.")
 
     for mnemonic_line in mnemonics:
         mnemonic = mnemonic_line.split(':')[0]
         address = mnemonic_line.split(':')[1]
-        if check_derivation_paths:
-            index = 0
-            tries = 0
-            while True:
-                tries += 1
-                try:
-                    sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
-                    default_derivation_path = f"m/44'/784'/{index}'/0'/0'"
-
-                    sui_config.recover_keypair_and_address(
-                        scheme=SignatureScheme.ED25519,
-                        mnemonics=mnemonic,
-                        derivation_path=default_derivation_path
-                    )
-                    sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
-
-                    objects = SuiClient(config=sui_config).get_objects()
-                    if len(list(objects.result_data.data)):
-                        list_of_sui_configs.append(SuiTransferConfig(config=sui_config, address=address))
-                        index += 1
-                    else:
-                        break
-                except:
-                    if tries > 3:
-                        break
-                    else:
-                        pass
-
+        sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
+        if '0x' in mnemonic:
+            sui_config.add_keypair_from_keystring(keystring={
+                'wallet_key': mnemonic,
+                'key_scheme': SignatureScheme.ED25519
+            })
         else:
-            sui_config = SuiConfig.user_config(rpc_url=sui_rpc)
             sui_config.recover_keypair_and_address(
                 scheme=SignatureScheme.ED25519,
                 mnemonics=mnemonic,
                 derivation_path=SUI_DEFAULT_DERIVATION_PATH
             )
-            sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
-            list_of_sui_configs.append(SuiTransferConfig(config=sui_config, address=address))
-
-    if check_derivation_paths:
-        logger.info(f"{len(list_of_sui_configs)} non-empty wallets has been found from {len(mnemonics)} mnemonics.")
+        sui_config.set_active_address(address=SuiAddress(sui_config.addresses[0]))
+        list_of_sui_configs.append(SuiTransferConfig(config=sui_config, address=address))
 
     return list_of_sui_configs
 
 
-def get_sui_balance(sui_config: SuiConfig) -> SuiBalance:
+def get_sui_balance(sui_config: SuiConfig, coin_type: SuiString = None, denomination: int = None) -> SuiBalance:
     tries = 0
     while True:
         tries += 1
         try:
             client = SuiClient(config=sui_config)
-            sui_coin_objects: SuiCoinObjects = client.get_gas(address=sui_config.active_address,
+            if coin_type:
+                coin_objects: SuiCoinObjects = client.get_coin(coin_type=coin_type, address=sui_config.active_address,
+                                                               fetch_all=True).result_data
+            else:
+                coin_objects: SuiCoinObjects = client.get_gas(address=sui_config.active_address,
                                                               fetch_all=True).result_data
 
             balance = 0
-            for obj in list(sui_coin_objects.data):
+            for obj in list(coin_objects.data):
                 balance += int(obj.balance)
 
-            return SuiBalance(
-                int=balance,
-                float=round(balance / 10 ** SUI_NATIVE_DENOMINATION, 2)
-            )
+            if denomination:
+                return SuiBalance(
+                    int=balance,
+                    float=round(balance / 10 ** denomination, 2)
+                )
+            else:
+                return SuiBalance(
+                    int=balance,
+                    float=round(balance / 10 ** SUI_DENOMINATION, 2)
+                )
         except:
             if tries <= 5:
                 time.sleep(3)
@@ -165,9 +109,15 @@ def init_transaction(sui_config: SuiConfig, merge_gas_budget: bool = False) -> S
     )
 
 
-def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction,
+def build_and_execute_tx(sui_config: SuiConfig,
+                         transaction: SyncTransaction,
                          gas_object: ObjectID = None) -> SuiTxResult:
+    # rpc_result = transaction.execute(gas_budget=SUI_DEFAULT_GAS_BUDGET)
     build = transaction.inspect_all()
+    gas_used = build.effects.gas_used
+    gas_budget = int((int(gas_used.computation_cost) + int(gas_used.non_refundable_storage_fee) +
+                      abs(int(gas_used.storage_cost) - int(gas_used.storage_rebate))) * 1.1)
+
     if build.error:
         return SuiTxResult(
             address=str(sui_config.active_address),
@@ -177,9 +127,9 @@ def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction,
     else:
         try:
             if gas_object:
-                rpc_result = transaction.execute(use_gas_object=gas_object, gas_budget=SUI_GAS_BUDGET)
+                rpc_result = transaction.execute(use_gas_object=gas_object, gas_budget=str(gas_budget))
             else:
-                rpc_result = transaction.execute(gas_budget=SUI_GAS_BUDGET)
+                rpc_result = transaction.execute(gas_budget=str(gas_budget))
             if rpc_result.result_data:
                 if rpc_result.result_data.status == 'success':
                     return SuiTxResult(
@@ -202,6 +152,70 @@ def build_and_execute_tx(sui_config: SuiConfig, transaction: SyncTransaction,
             logger.exception(e)
 
 
+def independent_merge_sui_coins_tx(sui_config: SuiConfig):
+    merge_results = []
+
+    zero_coins, non_zero_coins, richest_coin = get_sui_coin_objects_for_merge(sui_config=sui_config)
+    if len(zero_coins) and len(non_zero_coins):
+        logger.info(f'{short_address(str(sui_config.active_address))} | trying to merge zero_coins.')
+        transaction = init_transaction(sui_config=sui_config)
+        transaction.merge_coins(merge_to=transaction.gas, merge_from=zero_coins)
+        build_result = build_and_execute_tx(
+            sui_config=sui_config,
+            transaction=transaction,
+            gas_object=ObjectID(richest_coin.object_id)
+        )
+        if build_result:
+            merge_results.append(build_result)
+            time.sleep(5)
+        zero_coins, non_zero_coins, richest_coin = get_sui_coin_objects_for_merge(sui_config=sui_config)
+
+    if len(non_zero_coins) > 1:
+        logger.info(f'{short_address(str(sui_config.active_address))} | trying to merge non_zero_coins.')
+        non_zero_coins.remove(richest_coin)
+
+        transaction = init_transaction(sui_config=sui_config)
+        transaction.merge_coins(merge_to=transaction.gas, merge_from=non_zero_coins)
+        build_result = build_and_execute_tx(
+            sui_config=sui_config,
+            transaction=transaction,
+            gas_object=ObjectID(richest_coin.object_id)
+        )
+        if build_result:
+            merge_results.append(build_result)
+            time.sleep(5)
+
+    return merge_results
+
+
+def get_pre_merged_tx(sui_config: SuiConfig, transaction: SyncTransaction) -> SuiTx:
+    merge_count = 0
+
+    zero_coins, non_zero_coins, richest_coin = get_sui_coin_objects_for_merge(sui_config=sui_config)
+    if len(zero_coins) and len(non_zero_coins):
+        merge_count += 1
+        transaction.merge_coins(merge_to=transaction.gas, merge_from=zero_coins)
+    if len(non_zero_coins) > 1:
+        non_zero_coins.remove(richest_coin)
+        merge_count += 1
+        transaction.merge_coins(merge_to=transaction.gas, merge_from=non_zero_coins)
+    return SuiTx(builder=transaction, gas=ObjectID(richest_coin.object_id), merge_count=merge_count)
+
+
+def transfer_sui_tx(sui_config: SuiConfig, recipient: str, amount: SuiBalance) -> SuiTxResult:
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
+    # transaction = init_transaction(sui_config=sui_config, merge_gas_budget=True)
+
+    transaction.transfer_sui(
+        recipient=SuiAddress(recipient),
+        from_coin=transaction.gas,
+        amount=amount.int,
+    )
+
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
+
+
 def execute_move_tx(sui_config: SuiConfig, game_id: str, move: Arrow) -> Sui8192MoveResult:
     transaction = init_transaction(sui_config=sui_config, merge_gas_budget=True)
 
@@ -222,7 +236,7 @@ def execute_move_tx(sui_config: SuiConfig, game_id: str, move: Arrow) -> Sui8192
             reason=build.error
         )
     else:
-        rpc_result = transaction.execute(gas_budget=SuiString(SUI_GAS_BUDGET))
+        rpc_result = transaction.execute(gas_budget=SuiString(SUI_DEFAULT_GAS_BUDGET))
         if rpc_result.result_data.status == 'success':
             return Sui8192MoveResult(
                 address=str(sui_config.active_address),
@@ -265,7 +279,7 @@ def play_coinflip_tx(sui_config: SuiConfig,
                      bet_amount: int) -> SuiTxResult:
     transaction = init_transaction(sui_config=sui_config, merge_gas_budget=True)
 
-    bet_amount_in_dec = int(bet_amount * 10 ** SUI_NATIVE_DENOMINATION)
+    bet_amount_in_dec = int(bet_amount * 10 ** SUI_DENOMINATION)
     split = transaction.split_coin(
         coin=transaction.gas,
         amounts=[bet_amount_in_dec]
@@ -304,8 +318,8 @@ def create_profile(sui_config: SuiConfig,
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
 
 
-def save_quest(sui_config: SuiConfig,
-               profile_addr: str) -> SuiTxResult:
+def save_quest_tx(sui_config: SuiConfig,
+                  profile_addr: str) -> SuiTxResult:
     transaction = init_transaction(sui_config=sui_config, merge_gas_budget=True)
 
     t1 = random.randint(3500, 4500)
@@ -325,55 +339,212 @@ def save_quest(sui_config: SuiConfig,
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
 
 
-def get_sui_coin_objects_for_merge(sui_config: SuiConfig):
-    gas_coin_objects: SuiCoinObjects = handle_result(SuiClient(sui_config).get_gas(sui_config.active_address,
-                                                                                   fetch_all=True))
-    zero_coins = [x for x in gas_coin_objects.data if int(x.balance) == 0]
-    non_zero_coins = [x for x in gas_coin_objects.data if int(x.balance) > 0]
+def navi_deposit_sui_tx(sui_config: SuiConfig, amount: SuiBalance):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
 
-    richest_coin = max(non_zero_coins, key=lambda x: int(x.balance), default=None)
-    return zero_coins, non_zero_coins, richest_coin
+    split = transaction.split_coin(
+        coin=transaction.gas,
+        amounts=[amount.int]
+    )
+
+    transaction.move_call(
+        target=SuiString(NAVI_LENDING_SUI_TARGET),
+        arguments=[
+            ObjectID(NAVI_LENDING_SUI_ARG0),
+            ObjectID(NAVI_LENDING_SUI_ARG1),
+            ObjectID(NAVI_LENDING_SUI_ARG2),
+            SuiU8(0),
+            split,
+            SuiU64(amount.int),
+            ObjectID(NAVI_LENDING_SUI_ARG6)
+        ],
+        type_arguments=[
+            '0x2::sui::SUI'
+        ]
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
 
 
-def merge_sui_coins_tx(sui_config: SuiConfig):
-    merge_results = []
+def navi_borrow_sui_tx(sui_config: SuiConfig, amount: SuiBalance):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
 
-    zero_coins, non_zero_coins, richest_coin = get_sui_coin_objects_for_merge(sui_config=sui_config)
-    if len(zero_coins) and len(non_zero_coins):
-        logger.info(f'{short_address(str(sui_config.active_address))} | trying to merge zero_coins.')
-        transaction = init_transaction(sui_config=sui_config)
-        transaction.merge_coins(merge_to=transaction.gas, merge_from=zero_coins)
-        build_result = build_and_execute_tx(
-            sui_config=sui_config,
-            transaction=transaction,
-            gas_object=ObjectID(richest_coin.object_id)
+    transaction.move_call(
+        target=SuiString(NAVI_BORROW_SUI_TARGET),
+        arguments=[
+            ObjectID(NAVI_LENDING_SUI_ARG0),
+            ObjectID(NAVI_BORROW_SUI_ARG0),
+            ObjectID(NAVI_LENDING_SUI_ARG1),
+            ObjectID(NAVI_LENDING_SUI_ARG2),
+            SuiU8(0),
+            SuiU64(amount.int),
+        ],
+        type_arguments=[
+            '0x2::sui::SUI'
+        ]
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
+
+
+def navi_repay_sui_tx(sui_config: SuiConfig, amount: SuiBalance):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
+
+    split = transaction.split_coin(
+        coin=transaction.gas,
+        amounts=[amount.int + NAVI_REPAY_FEE]
+    )
+
+    transaction.move_call(
+        target=SuiString(NAVI_REPAY_SUI_TARGET),
+        arguments=[
+            ObjectID(NAVI_LENDING_SUI_ARG0),
+            ObjectID(NAVI_BORROW_SUI_ARG0),
+            ObjectID(NAVI_LENDING_SUI_ARG1),
+            ObjectID(NAVI_LENDING_SUI_ARG2),
+            SuiU8(0),
+            split,
+            SuiU64(amount.int + NAVI_REPAY_FEE),
+        ],
+        type_arguments=[
+            '0x2::sui::SUI'
+        ]
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
+
+
+def scallop_deposit_sui_tx(sui_config: SuiConfig, amount: SuiBalance):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
+
+    split = transaction.split_coin(
+        coin=transaction.gas,
+        amounts=[amount.int]
+    )
+
+    default_nested_index = 0
+    move_call = transaction.move_call(
+        target=SuiString(SCALLOP_LENDING_SUI_TARGET),
+        arguments=[
+            ObjectID(SCALLOP_LENDING_SUI_ARG1),
+            ObjectID(SCALLOP_LENDING_SUI_ARG2),
+            Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 0)),
+            ObjectID(SCALLOP_LENDING_SUI_ARG3),
+        ],
+        type_arguments=['0x2::sui::SUI']
+    )
+
+    transaction.transfer_objects(
+        transfers=[move_call],
+        recipient=SuiAddress(str(sui_config.active_address))
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction,
+                                gas_object=ObjectID(tx_object.gas.object_id))
+
+
+def scallop_withdraw_sui_tx(sui_config: SuiConfig, amount: int, merge_list: list[SuiCoinObject]):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
+
+    if len(merge_list):
+        transaction.merge_coins(merge_to=merge_list[0], merge_from=merge_list[1:])
+
+    split = transaction.split_coin(
+        coin=merge_list[0],
+        amounts=[amount]
+    )
+
+    transaction.transfer_objects(
+        transfers=[merge_list[0]],
+        recipient=SuiAddress(str(sui_config.active_address))
+    )
+
+    default_nested_index = 1
+    move_call = transaction.move_call(
+        target=SuiString(SCALLOP_WITHDRAW_SUI_TARGET),
+        arguments=[
+            ObjectID(SCALLOP_LENDING_SUI_ARG1),
+            ObjectID(SCALLOP_LENDING_SUI_ARG2),
+            Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 0)),
+            ObjectID(SCALLOP_LENDING_SUI_ARG3),
+        ],
+        type_arguments=['0x2::sui::SUI']
+    )
+
+    transaction.transfer_objects(
+        transfers=[move_call],
+        recipient=SuiAddress(str(sui_config.active_address))
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
+
+
+def kriya_swap_tx(sui_config: SuiConfig, amount: int, minimum_received: int, token_from: str = None):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
+
+    if token_from == 'USDC':
+        zero_coins, non_zero_coins, richest_coin = get_sui_coin_objects_for_merge(sui_config=sui_config,
+                                                                                  coin_type=USDC_COIN_TYPE)
+
+        if len(non_zero_coins + zero_coins) > 1:
+            non_zero_coins.remove(richest_coin)
+            transaction.merge_coins(merge_to=richest_coin, merge_from=zero_coins + non_zero_coins)
+
+        move_call = transaction.move_call(
+            target=SuiString(KRIYA_USDC_SUI_MAIN_TARGET),
+            arguments=[
+                ObjectID(KRIYA_SUI_USDC_POOL),
+                ObjectID(richest_coin.coin_object_id),
+                SuiU64(amount),
+                SuiU64(minimum_received)
+            ],
+            type_arguments=[
+                '0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN',
+                '0x2::sui::SUI'
+            ]
         )
-        if build_result:
-            merge_results.append(build_result)
-            time.sleep(5)
-        zero_coins, non_zero_coins, richest_coin = get_sui_coin_objects_for_merge(sui_config=sui_config)
-
-    if len(non_zero_coins) > 1:
-        logger.info(f'{short_address(str(sui_config.active_address))} | trying to merge non_zero_coins.')
-        non_zero_coins.remove(richest_coin)
-
-        transaction = init_transaction(sui_config=sui_config)
-        transaction.merge_coins(merge_to=transaction.gas, merge_from=non_zero_coins)
-        build_result = build_and_execute_tx(
-            sui_config=sui_config,
-            transaction=transaction,
-            gas_object=ObjectID(richest_coin.object_id)
+    else:
+        split = transaction.split_coin(
+            coin=transaction.gas,
+            amounts=[amount]
         )
-        if build_result:
-            merge_results.append(build_result)
-            time.sleep(5)
 
-    return merge_results
+        move_call = transaction.move_call(
+            target=SuiString(KRIYA_SUI_USDC_MAIN_TARGET),
+            arguments=[
+                ObjectID(KRIYA_SUI_USDC_POOL),
+                split,
+                SuiU64(amount),
+                SuiU64(minimum_received)
+            ],
+            type_arguments=[
+                '0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN',
+                '0x2::sui::SUI'
+            ]
+        )
+
+    transaction.transfer_objects(transfers=[move_call], recipient=sui_config.active_address)
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
+
+
+def get_provided_sui_balance(sui_config: SuiConfig) -> SuiBalance:
+    sui_reserve_coin_objects: SuiCoinObjects = SuiClient(config=sui_config).get_coin(
+        coin_type=SuiString(SUI_RESERVE_COIN_TYPE),
+        fetch_all=True).result_data
+
+    already_provided_int = sum(int(obj.balance) for obj in sui_reserve_coin_objects.data)
+    already_provided_float = round(already_provided_int / 10 ** SUI_DENOMINATION, 2)
+
+    return SuiBalance(
+        int=already_provided_int,
+        float=already_provided_float
+    )
 
 
 def merge_sui_coins(sui_config: SuiConfig):
     try:
-        results = merge_sui_coins_tx(sui_config=sui_config)
+        results = independent_merge_sui_coins_tx(sui_config=sui_config)
         if results:
             for result in results:
                 if result:
@@ -383,18 +554,91 @@ def merge_sui_coins(sui_config: SuiConfig):
                     else:
                         logger.info(f'{short_address(result.address)} | MERGE | digest: {result.digest}.')
         else:
-            logger.info(f'{short_address(str(sui_config.active_address))} | nothing to merge.')
+            # logger.info(f'{short_address(str(sui_config.active_address))} | nothing to merge.')
+            pass
     except:
         pass
 
 
-def transfer_sui_tx(sui_config: SuiConfig, recipient: str, amount: SuiBalance) -> SuiTxResult:
-    transaction = init_transaction(sui_config=sui_config, merge_gas_budget=True)
+def get_sui_coin_objects_for_merge(sui_config: SuiConfig, coin_type: SuiString = None):
+    if coin_type:
+        gas_coin_objects: SuiCoinObjects = handle_result(SuiClient(sui_config).get_coin(
+            coin_type=coin_type,
+            address=sui_config.active_address,
+            fetch_all=True)
+        )
+    else:
+        gas_coin_objects: SuiCoinObjects = handle_result(SuiClient(sui_config).get_gas(sui_config.active_address,
+                                                                                       fetch_all=True))
+    zero_coins = [x for x in gas_coin_objects.data if int(x.balance) == 0]
+    non_zero_coins = [x for x in gas_coin_objects.data if int(x.balance) > 0]
 
-    transaction.transfer_sui(
-        recipient=SuiAddress(recipient),
-        from_coin=transaction.gas,
-        amount=amount.int,
-    )
+    richest_coin = max(non_zero_coins, key=lambda x: int(x.balance), default=None)
+    return zero_coins, non_zero_coins, richest_coin
 
-    return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
+# def turbos_swap_tx(sui_config: SuiConfig, pool_addr: str, amount: int):
+#     transaction = init_transaction(sui_config=sui_config, merge_gas_budget=True)
+#
+#     split = transaction.split_coin(
+#         coin=transaction.gas,
+#         amounts=[amount]
+#     )
+#
+#     transaction.make_move_vector(
+#         [Argument(name="NestedResult", value=(0, 0))]
+#     )
+#
+#     transaction.move_call(
+#         target=SuiString(TURBOS_SUI_USDC_MAIN_TARGET),
+#         arguments=[
+#             ObjectID(TURBOS_SUI_USDC_ARG1),
+#             split,
+#             amount,
+#             get_minimum_usdc_to_receive(sui_amount=amount, price=get_sui_price()),
+#             457_111_694_183_490_676,
+#             True,
+#             ObjectID(str(sui_config.active_address)),
+#             # u
+#             ObjectID(NAVI_LENDING_SUI_ARG0),
+#             ObjectID(TURBOS_SUI_USDC_ARG2),
+#
+#         ],
+#         type_arguments=[
+#             '0x2::sui::SUI',
+#             '0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN',
+#             '0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::fee3000bps::FEE3000BPS'
+#         ]
+#     )
+#
+#     return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
+
+
+# def get_every_event(sui_config: SuiConfig):
+#     has_next_page = True
+#     next_cursor = None
+#     limit = 50
+#
+#     events = None
+#
+#     while has_next_page:
+#         if next_cursor:
+#             latest_events: EventQueryEnvelope = SuiClient(config=sui_config).get_events(
+#                 query=SenderEventQuery(sender=sui_config.active_address), limit=limit, cursor=EventID(
+#                     event_seq=next_cursor['eventSeq'],
+#                     tx_seq=next_cursor['txDigest']
+#                 )
+#             ).result_data
+#         else:
+#             latest_events: EventQueryEnvelope = SuiClient(config=sui_config).get_events(
+#                 query=SenderEventQuery(sender=sui_config.active_address), limit=limit
+#             ).result_data
+#         has_next_page = latest_events.has_next_page
+#         next_cursor = latest_events.next_cursor
+#
+#         if events:
+#             events.data += latest_events.data
+#             # time.sleep(random.randint(3, 5))
+#         else:
+#             events = latest_events
+#
+#     return events

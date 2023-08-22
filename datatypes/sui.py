@@ -1,8 +1,12 @@
 from enum import Enum
 from typing import Optional
 
+from typing import Any
+from pysui.sui.sui_txn import SyncTransaction
+
 from pydantic import BaseModel
 from pysui import SuiConfig
+from pysui.sui.sui_types.scalars import ObjectID
 
 
 class Arrow(Enum):
@@ -42,3 +46,13 @@ class SuiTransferConfig(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
+
+class SuiTx(BaseModel):
+    builder: SyncTransaction
+    gas: ObjectID
+    merge_count: Optional[int]
+
+    class Config:
+        arbitrary_types_allowed = True
+

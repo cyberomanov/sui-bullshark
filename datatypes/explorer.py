@@ -100,15 +100,28 @@ class ExplorerResponse(BaseModel):
     result: ExplorerResult
 
 
+class Metadata(BaseModel):
+    SUI_TVL: float
+    NON_SUI_TVL_IN_USD: float
+    appsUsed: list[str]
+    NAVI_VALUE: int
+    CETUS_VALUE: int
+    KRIYA_VALUE: int
+    TYPUS_VALUE: int
+    TURBOS_VALUE: int
+    SCALLOP_VALUE: int
+
+
 class Data(BaseModel):
-    bullsharkId: list[str]
-    score: int
+    address: str
     bot: bool
-    rank: int
-    numCommandsDeSuiFlip: int
-    numCommandsEthos8192: int
-    numCommandsJourneyToMountSogol: int
-    numCommandsMiniMiners: int
+    bullsharks: list[str]
+    capys: list[str]
+    score: int
+    rank: int | None
+    reward: int | None
+    metadata: Metadata
+    questId: int
 
 
 class Result(BaseModel):
@@ -125,5 +138,5 @@ class PointRankResponse(BaseModel):
 
 class SuiAddressReport(BaseModel):
     address: str
-    rank: int
-    score: int
+    rank: Optional[int]
+    score: Optional[int]
