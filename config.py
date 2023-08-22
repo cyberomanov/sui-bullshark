@@ -18,7 +18,7 @@ sui_rpc = "https://sui-rpc-mainnet.testnet-pride.com/"
 short_sleep_between_txs_in_range_in_sec = (5, 15)
 long_sleep_between_txs_in_range_in_sec = (15, 30)
 start_threads_simultaneously = False
-random_account_clusters = True
+random_account_clusters = False
 
 ######################################################
 
