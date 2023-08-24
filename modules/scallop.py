@@ -39,7 +39,7 @@ def main_scallop_deposit_sui(sui_config: SuiConfig):
                 )
 
                 balance = get_sui_balance(sui_config=sui_config)
-                if balance.int > int(amount_to_provide.int * 1.1):
+                if balance.int > amount_to_provide.int:
                     result = scallop_deposit_sui_tx(sui_config=sui_config, amount=amount_to_provide)
 
                     sleep = 0
@@ -65,7 +65,7 @@ def main_scallop_deposit_sui(sui_config: SuiConfig):
                 else:
                     logger.warning(f'{short_address(str(sui_config.active_address))} | SCALLOP_DEPOSIT | '
                                    f'balance is not enough: {balance.float} $SUI. '
-                                   f'minimum required: {round(amount_to_provide.int, 2)} $SUI.')
+                                   f'minimum required: {round(amount_to_provide.float, 2)} $SUI.')
             else:
                 logger.info(f'{short_address(str(sui_config.active_address))} | SCALLOP_DEPOSIT | '
                             f'enough provided liquidity: {provided_sui.float} $SUI.')
