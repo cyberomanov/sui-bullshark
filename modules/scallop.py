@@ -34,8 +34,8 @@ def main_scallop_deposit_sui(sui_config: SuiConfig):
             if difference > get_sui_balance_object_from_range(min_amount=0.001, max_amount=0.002).int:
 
                 amount_to_provide = get_sui_balance_object_from_range(
-                    min_amount=round(difference * 0.9 / 10 ** SUI_DENOMINATION, 2),
-                    max_amount=round(difference * 1.1 / 10 ** SUI_DENOMINATION, 2)
+                    min_amount=round(difference * 1 / 10 ** SUI_DENOMINATION, 2),
+                    max_amount=round(difference * 1 / 10 ** SUI_DENOMINATION, 2)
                 )
 
                 balance = get_sui_balance(sui_config=sui_config)
