@@ -7,7 +7,7 @@ from pysui.sui.sui_config import SuiConfig
 
 from config import (short_sleep_between_txs_in_range_in_sec,
                     start_threads_simultaneously)
-from data import CAPY_MINT_PRICE
+from data import CAPY_MINT_PRICE, ONE_SUI_TOKEN
 from utils import (short_address,
                    get_sui_balance,
                    capy_mint_sui_tx)
@@ -36,6 +36,10 @@ def main_minter(sui_config: SuiConfig):
                 logger.info(f'{short_address(result.address)} | CAPY_MINTER | digest: {result.digest} | '
                             f'sleep: {sleep}s.')
             time.sleep(sleep)
+        else:
+            logger.warning(f'{short_address(str(sui_config.active_address))} | CAPY_MINTER | '
+                           f'balance is not enough: {balance.float} $SUI. '
+                           f'minimum required: {round(CAPY_MINT_PRICE / ONE_SUI_TOKEN, 1)} $SUI.')
 
     except Exception as e:
         logger.exception(e)

@@ -30,11 +30,11 @@ if __name__ == '__main__':
             sui_price = get_sui_price()
             time.sleep(1)
             func = input('\n'
-                         '1. navi_deposit_borrow_repay();             # there is no withdraw module!\n'
-                         '2. scallop_deposit_liquidity();             # following the config\n'
-                         '3. scallop_withdraw_liquidity();            # 100% of provided liquidity\n'
-                         '4. kriya_swap(from_token=SUI);              # to $USDC only, following the config\n'
-                         '5. kriya_swap(from_token=USDC);             # to $SUI only, 100% of balance\n\n'
+                         '1. navi_deposit_borrow_repay();      # there is no withdraw module!\n'
+                         '2. scallop_deposit_liquidity();      # following the config\n'
+                         '3. scallop_withdraw_liquidity();     # 100% of provided liquidity\n'
+                         '4. kriya_swap(from_token=SUI);       # to $USDC only, following the config\n'
+                         '5. kriya_swap(from_token=USDC);      # to $SUI only, 100% of balance\n\n'
                          '55. report();\n'
                          '56. transfer();\n'
                          '57. mnemonic_generator();\n'
