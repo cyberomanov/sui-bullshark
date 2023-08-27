@@ -5,12 +5,17 @@ from loguru import logger
 from data import VERSION
 from modules.generator import main_generator
 from modules.kriya import main_kriya_executor
+from modules.minter import main_minter_executor
 from modules.navi import main_navi_executor
 from modules.report import main_report_executor
 from modules.scallop import main_scallop_executor
 from modules.transfer import main_transfer_executor
-from utils import add_logger, read_mnemonics, get_list_of_sui_configs, get_list_of_transfer_configs, get_sui_price, \
-    get_random_account_cluster
+from utils import (add_logger,
+                   read_mnemonics,
+                   get_list_of_sui_configs,
+                   get_list_of_transfer_configs,
+                   get_sui_price,
+                   get_random_account_cluster)
 
 if __name__ == '__main__':
     add_logger(version=VERSION)
@@ -32,7 +37,8 @@ if __name__ == '__main__':
                          '5. kriya_swap(from_token=USDC);             # to $SUI only, 100% of balance\n\n'
                          '55. report();\n'
                          '56. transfer();\n'
-                         '57. mnemonic_generator();\n\n'
+                         '57. mnemonic_generator();\n'
+                         '58. capy_mint();\n\n'
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
                          # '79. journey();           # deprecated\n\n'
@@ -68,6 +74,9 @@ if __name__ == '__main__':
             if func == '57':
                 print()
                 main_generator()
+            if func == '58':
+                print()
+                main_minter_executor(sui_configs=sui_configs)
 
             # if func == '77':
             #     print()

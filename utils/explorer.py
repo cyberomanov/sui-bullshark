@@ -10,7 +10,8 @@ from config import sui_rpc
 from datatypes import (ExplorerResponse,
                        ExplorerBodyResult,
                        ExplorerSuiCoinsResponse,
-                       PointRankResponse, SuiAddressReport)
+                       PointRankResponse,
+                       SuiAddressReport)
 from utils.sui import get_sui_balance
 
 

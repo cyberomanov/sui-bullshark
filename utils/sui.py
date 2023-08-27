@@ -528,6 +528,53 @@ def kriya_swap_tx(sui_config: SuiConfig, amount: int, minimum_received: int, tok
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
 
 
+def capy_mint_sui_tx(sui_config: SuiConfig):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
+
+    split = transaction.split_coin(
+        coin=transaction.gas,
+        amounts=[CAPY_MINT_PRICE]
+    )
+
+    move_call_1 = transaction.move_call(
+        target=SuiString(CAPY_MOVE_CALL_1_TARGET),
+        arguments=[]
+    )
+
+    default_nested_index = 1
+    move_call_2 = transaction.move_call(
+        target=SuiString(CAPY_MOVE_CALL_2_TARGET),
+        arguments=[
+            ObjectID(CAPY_MINT_INPUT_1),
+            ObjectID(SCALLOP_LENDING_SUI_ARG3),
+            split,
+            Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 0)),
+            Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 1)),
+            ObjectID(CAPY_MINT_INPUT_3),
+
+        ],
+        type_arguments=["0xee496a0cc04d06a345982ba6697c90c619020de9e274408c7819f787ff66e1a1::capy::Capy"]
+    )
+
+    default_nested_index = 1
+    move_call_3 = transaction.move_call(
+        target=SuiString(CAPY_MOVE_CALL_3_TARGET),
+        arguments=[
+            Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 0)),
+        ],
+        type_arguments=["0x2::kiosk::Kiosk"]
+    )
+
+    default_nested_index = 1
+    transaction.transfer_objects(
+        transfers=[Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 1)), split],
+        recipient=SuiAddress(str(sui_config.active_address))
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction,
+                                gas_object=ObjectID(tx_object.gas.object_id))
+
+
 def get_provided_sui_balance(sui_config: SuiConfig) -> SuiBalance:
     sui_reserve_coin_objects: SuiCoinObjects = SuiClient(config=sui_config).get_coin(
         coin_type=SuiString(SUI_RESERVE_COIN_TYPE),
