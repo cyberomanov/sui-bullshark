@@ -2,6 +2,7 @@ import time
 
 from loguru import logger
 
+from config import random_account_clusters
 from data import VERSION
 from modules.generator import main_generator
 from modules.kriya import main_kriya_executor
@@ -25,7 +26,8 @@ if __name__ == '__main__':
             transfer_mnemonics = read_mnemonics(path='data/transfer.txt')
 
             sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
-            random_sui_configs_cluster = get_random_account_cluster(sui_configs=sui_configs)
+            random_sui_configs_cluster = get_random_account_cluster(sui_configs=sui_configs,
+                                                                    randomize=random_account_clusters)
 
             sui_price = get_sui_price()
             time.sleep(1)

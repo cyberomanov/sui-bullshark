@@ -64,11 +64,14 @@ def get_sui_balance_object_from_range(min_amount: float, max_amount: float,
     )
 
 
-def get_random_account_cluster(sui_configs: list[SuiConfig]):
-    sui_configs_len = len(sui_configs)
+def get_random_account_cluster(sui_configs: list[SuiConfig], randomize: bool = False) -> list[SuiConfig]:
+    if randomize:
+        sui_configs_len = len(sui_configs)
 
-    min_accs_to_remove = int(0.05 * sui_configs_len)
-    max_accs_to_remove = int(0.5 * sui_configs_len)
+        min_accs_to_remove = int(0.05 * sui_configs_len)
+        max_accs_to_remove = int(0.5 * sui_configs_len)
 
-    accs_to_remove = random.sample(sui_configs, random.randint(min_accs_to_remove, max_accs_to_remove))
-    return [element for element in sui_configs if element not in accs_to_remove]
+        accs_to_remove = random.sample(sui_configs, random.randint(min_accs_to_remove, max_accs_to_remove))
+        return [element for element in sui_configs if element not in accs_to_remove]
+    else:
+        return sui_configs
