@@ -36,7 +36,7 @@ def main_report_executor(sui_configs: list[SuiConfig]):
     top500_rewards = round(float(len(top500) * 2_500), 1)
     top1k_rewards = round(float(len(top1k) * 1_250), 1)
     top5k_rewards = round(float(len(top5k) * 156.25), 1)
-    other_rewards = round(float(others * 20), 1)
+    other_rewards = round(float(others * 12.5), 1)
 
     logger.info(f'expected rewards: {top500_rewards} + {top1k_rewards} + {top5k_rewards} + '
                 f'{other_rewards} ~ {round(top500_rewards + top1k_rewards + top5k_rewards + other_rewards, 1)} $SUI.')
