@@ -478,7 +478,8 @@ def scallop_withdraw_sui_tx(sui_config: SuiConfig, amount: int, merge_list: list
         transfers=[move_call],
         recipient=SuiAddress(str(sui_config.active_address))
     )
-    return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction,
+                                gas_object=ObjectID(tx_object.gas.object_id))
 
 
 def kriya_swap_tx(sui_config: SuiConfig, amount: int, minimum_received: int, token_from: str = None):
