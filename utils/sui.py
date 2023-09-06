@@ -199,6 +199,7 @@ def get_pre_merged_tx(sui_config: SuiConfig, transaction: SyncTransaction) -> Su
         non_zero_coins.remove(richest_coin)
         merge_count += 1
         transaction.merge_coins(merge_to=transaction.gas, merge_from=non_zero_coins)
+
     return SuiTx(builder=transaction, gas=ObjectID(richest_coin.object_id), merge_count=merge_count)
 
 
@@ -447,8 +448,9 @@ def scallop_withdraw_sui_tx(sui_config: SuiConfig, amount: int, merge_list: list
     tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
     transaction = tx_object.builder
 
-    if len(merge_list):
+    if len(merge_list) > 1:
         transaction.merge_coins(merge_to=merge_list[0], merge_from=merge_list[1:])
+        tx_object.merge_count += 1
 
     split = transaction.split_coin(
         coin=merge_list[0],
@@ -460,7 +462,7 @@ def scallop_withdraw_sui_tx(sui_config: SuiConfig, amount: int, merge_list: list
         recipient=SuiAddress(str(sui_config.active_address))
     )
 
-    default_nested_index = 1
+    default_nested_index = 0
     move_call = transaction.move_call(
         target=SuiString(SCALLOP_WITHDRAW_SUI_TARGET),
         arguments=[
@@ -476,7 +478,7 @@ def scallop_withdraw_sui_tx(sui_config: SuiConfig, amount: int, merge_list: list
         transfers=[move_call],
         recipient=SuiAddress(str(sui_config.active_address))
     )
-    return build_and_execute_tx(sui_config=sui_config, transaction=transaction, gas_object=tx_object.gas)
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction)
 
 
 def kriya_swap_tx(sui_config: SuiConfig, amount: int, minimum_received: int, token_from: str = None):
