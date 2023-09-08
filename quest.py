@@ -4,6 +4,7 @@ from loguru import logger
 
 from config import random_account_clusters
 from data import VERSION
+from modules.claim import main_claim_reward_executor
 from modules.generator import main_generator
 from modules.kriya import main_kriya_executor
 from modules.minter import main_minter_executor
@@ -40,7 +41,8 @@ if __name__ == '__main__':
                          '55. report();\n'
                          '56. transfer();\n'
                          '57. mnemonic_generator();\n'
-                         '58. capy_mint();\n\n'
+                         '58. capy_mint();\n'
+                         '59. reward_claim();\n\n'
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
                          # '79. journey();           # deprecated\n\n'
@@ -79,6 +81,9 @@ if __name__ == '__main__':
             if func == '58':
                 print()
                 main_minter_executor(sui_configs=sui_configs)
+            if func == '59':
+                print()
+                main_claim_reward_executor(sui_configs=sui_configs)
 
             # if func == '77':
             #     print()

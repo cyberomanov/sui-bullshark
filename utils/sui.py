@@ -112,7 +112,7 @@ def init_transaction(sui_config: SuiConfig, merge_gas_budget: bool = False) -> S
 def build_and_execute_tx(sui_config: SuiConfig,
                          transaction: SyncTransaction,
                          gas_object: ObjectID = None) -> SuiTxResult:
-    # rpc_result = transaction.execute(gas_budget=SUI_DEFAULT_GAS_BUDGET)
+    # rpc_result = transaction.execute(use_gas_object=gas_object, gas_budget=SUI_DEFAULT_GAS_BUDGET)
     build = transaction.inspect_all()
     gas_used = build.effects.gas_used
     gas_budget = int((int(gas_used.computation_cost) + int(gas_used.non_refundable_storage_fee) +
@@ -572,6 +572,27 @@ def capy_mint_sui_tx(sui_config: SuiConfig):
     default_nested_index = 1
     transaction.transfer_objects(
         transfers=[Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 1)), split],
+        recipient=SuiAddress(str(sui_config.active_address))
+    )
+    return build_and_execute_tx(sui_config=sui_config, transaction=transaction,
+                                gas_object=ObjectID(tx_object.gas.object_id))
+
+
+def claim_reward(sui_config: SuiConfig, signature: list):
+    tx_object = get_pre_merged_tx(sui_config=sui_config, transaction=init_transaction(sui_config=sui_config))
+    transaction = tx_object.builder
+
+    move_call = transaction.move_call(
+        target=SuiString(REWARD_CLAIM_TARGET),
+        arguments=[
+            ObjectID(REWARD_CLAIM_ARG0),
+            [SuiU8(x) for x in signature]
+        ]
+    )
+
+    default_nested_index = 0
+    transaction.transfer_objects(
+        transfers=[Argument(name="NestedResult", value=(default_nested_index + tx_object.merge_count, 0))],
         recipient=SuiAddress(str(sui_config.active_address))
     )
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction,

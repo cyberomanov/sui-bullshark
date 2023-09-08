@@ -1,3 +1,4 @@
+import base64
 import json
 import random
 
@@ -7,6 +8,7 @@ from random_username.generate import generate_username
 
 from data import SUI_DENOMINATION, TRANSFER_CRINGE_LIMIT
 from datatypes.nickname import NicknameResponse
+from datatypes.signature import SignatureResponse
 from datatypes.sui import SuiBalance
 
 
@@ -75,3 +77,22 @@ def get_random_account_cluster(sui_configs: list[SuiConfig], randomize: bool = F
         return [element for element in sui_configs if element not in accs_to_remove]
     else:
         return sui_configs
+
+
+def get_signature(address: str, quest_id: int) -> SignatureResponse:
+    url = 'https://quests.mystenlabs.com/api/trpc/redeem?batch=1'
+    data = {
+        "0":
+            {
+                "address": address,
+                "questId": quest_id
+            }
+    }
+
+    response = requests.post(url=url, json=data)
+    return SignatureResponse.parse_obj(json.loads(response.content)[0])
+
+
+def encode_signature(signature: str) -> list:
+    signature_bytes = base64.b64decode(signature)
+    return list(signature_bytes)
