@@ -3,4 +3,4 @@ pydantic==1.10.12
 pysui==0.34.0
 random_username==1.0.2
 Requests==2.31.0
-pysui-fastcrypto==0.1.4
+pysui-fastcrypto==0.2.0
