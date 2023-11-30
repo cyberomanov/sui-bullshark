@@ -79,7 +79,7 @@ def get_random_account_cluster(sui_configs: list[SuiConfig], randomize: bool = F
         return sui_configs
 
 
-def get_signature(address: str, quest_id: int) -> SignatureResponse:
+def get_signature(address: str, quest_id: int = 3) -> SignatureResponse | bool:
     url = 'https://quests.mystenlabs.com/api/trpc/redeem?batch=1'
     data = {
         "0":
@@ -90,7 +90,12 @@ def get_signature(address: str, quest_id: int) -> SignatureResponse:
     }
 
     response = requests.post(url=url, json=data)
-    return SignatureResponse.parse_obj(json.loads(response.content)[0])
+    if response.status_code == 500:
+        return False
+        # logger.info(f'{address} has no rewards')
+        # return get_signature(address=address, quest_id=quest_id)
+    else:
+        return SignatureResponse.parse_obj(json.loads(response.content)[0])
 
 
 def encode_signature(signature: str) -> list:

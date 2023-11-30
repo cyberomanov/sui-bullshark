@@ -8,7 +8,7 @@ from pysui.sui.sui_clients.sync_client import SuiClient
 from pysui.sui.sui_config import SuiConfig
 from pysui.sui.sui_txn import SyncTransaction
 from pysui.sui.sui_txresults.single_tx import SuiCoinObjects, SuiCoinObject
-from pysui.sui.sui_types import SuiString, SuiU64, ObjectID, SuiArray, SuiU8, SuiInteger
+from pysui.sui.sui_types import SuiString, SuiU64, ObjectID, SuiU8
 from pysui.sui.sui_types.address import SuiAddress
 from pysui.sui.sui_types.bcs import Argument
 
@@ -289,12 +289,17 @@ def play_coinflip_tx(sui_config: SuiConfig,
     transaction.move_call(
         target=SuiString(GAME_COINFLIP_TARGET),
         arguments=[
-            ObjectID(associated_kiosk_addr),
-            SuiAddress(bullshark_addr),
+            ObjectID(GAME_COINFLIP_ARG1),
             SuiU8(coinflip_side.value),
-            SuiArray([SuiInteger(random.randint(1, 255)) for _ in range(16)]),
+            [SuiU8(random.randint(0, 255)) for _ in range(512)],
             split,
             ObjectID(GAME_COINFLIP_ARG5),
+            ObjectID(associated_kiosk_addr),
+            SuiAddress(bullshark_addr)
+        ],
+        type_arguments=[
+            '0x2::sui::SUI',
+            '0xee496a0cc04d06a345982ba6697c90c619020de9e274408c7819f787ff66e1a1::suifrens::SuiFren<0x8894fa02fc6f36cbc485ae9145d05f247a78e220814fb8419ab261bd81f08f32::bullshark::Bullshark>'
         ]
     )
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction)

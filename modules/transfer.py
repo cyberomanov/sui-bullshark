@@ -10,7 +10,7 @@ from datatypes import SuiTransferConfig
 from utils import (short_address,
                    get_sui_balance,
                    get_balance_to_transfer,
-                   transfer_sui_tx)
+                   transfer_sui_tx, merge_sui_coins)
 
 
 def main_transfer_executor(transfer_config: SuiTransferConfig):
@@ -21,7 +21,7 @@ def main_transfer_executor(transfer_config: SuiTransferConfig):
     recipient_address = transfer_config.address
 
     try:
-        # merge_sui_coins(sui_config=sui_config)
+        merge_sui_coins(sui_config=sui_config)
 
         at_least_one_swap = False
         while True:
