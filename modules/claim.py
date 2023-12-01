@@ -46,7 +46,7 @@ def main_claim_reward(sui_config: SuiConfig):
         else:
             logger.warning(
                     f'{short_address(str(sui_config.active_address))} | REWARD_CLAIM | '
-                    f'no rewards.')
+                    f'no more rewards.')
 
     except Exception as e:
         logger.exception(e)
