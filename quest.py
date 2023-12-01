@@ -30,7 +30,7 @@ if __name__ == '__main__':
             random_sui_configs_cluster = get_random_account_cluster(sui_configs=sui_configs,
                                                                     randomize=random_account_clusters)
 
-            sui_price = get_sui_price()
+            # sui_price = get_sui_price()
             time.sleep(1)
             func = input('\n'
                          '1. navi_deposit_borrow_repay();      # there is no withdraw module!\n'
