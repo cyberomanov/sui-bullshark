@@ -44,7 +44,7 @@ if __name__ == '__main__':
                          '57. mnemonic_generator();\n'
                          '58. capy_mint();\n'
                          '59. reward_claim();\n'
-                         '59. claim_x_transfer();\n\n'
+                         '60. claim_x_transfer();\n\n'
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
                          # '79. journey();           # deprecated\n\n'
