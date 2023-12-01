@@ -40,7 +40,7 @@ def main_claim_reward(sui_config: SuiConfig):
             else:
                 sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
                                        short_sleep_between_txs_in_range_in_sec[1])
-                logger.info(
+                logger.success(
                     f'{short_address(result.address)} | REWARD_CLAIM | '
                     f'digest: {result.digest} | sleep: {sleep}s.')
         else:

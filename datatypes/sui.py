@@ -50,7 +50,7 @@ class SuiTransferConfig(BaseModel):
 
 class SuiTx(BaseModel):
     builder: SyncTransaction
-    gas: ObjectID
+    gas: Optional[ObjectID]
     merge_count: Optional[int]
 
     class Config:

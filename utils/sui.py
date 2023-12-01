@@ -200,7 +200,8 @@ def get_pre_merged_tx(sui_config: SuiConfig, transaction: SyncTransaction) -> Su
         merge_count += 1
         transaction.merge_coins(merge_to=transaction.gas, merge_from=non_zero_coins)
 
-    return SuiTx(builder=transaction, gas=ObjectID(richest_coin.object_id), merge_count=merge_count)
+    return SuiTx(builder=transaction, gas=ObjectID(richest_coin.object_id) if richest_coin else None,
+                 merge_count=merge_count)
 
 
 def transfer_sui_tx(sui_config: SuiConfig, recipient: str, amount: SuiBalance) -> SuiTxResult:
@@ -601,7 +602,7 @@ def claim_reward(sui_config: SuiConfig, signature: list):
         recipient=SuiAddress(str(sui_config.active_address))
     )
     return build_and_execute_tx(sui_config=sui_config, transaction=transaction,
-                                gas_object=ObjectID(tx_object.gas.object_id))
+                                gas_object=ObjectID(tx_object.gas.object_id) if tx_object.gas else None)
 
 
 def get_provided_sui_balance(sui_config: SuiConfig) -> SuiBalance:

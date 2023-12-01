@@ -56,7 +56,7 @@ def main_transfer_executor(transfer_config: SuiTransferConfig):
                         else:
                             sleep = random.randint(short_sleep_between_txs_in_range_in_sec[0],
                                                    short_sleep_between_txs_in_range_in_sec[1])
-                            logger.info(
+                            logger.success(
                                 f'{short_address(result.address)} -> {short_address(recipient_address)} | '
                                 f'transfer: {balance_to_transfer.float} $SUI | digest: {result.digest} | '
                                 f'sleep: {sleep}s.')
