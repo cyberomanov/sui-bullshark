@@ -71,7 +71,7 @@ def main_transfer_executor(transfer_config: SuiTransferConfig):
                         break
                 else:
                     if not at_least_one_swap:
-                        logger.warning(
+                        logger.info(
                             f'{short_address(str(sui_config.active_address))} -> {short_address(recipient_address)} | '
                             f'balance is not enough: {balance.float} $SUI. '
                             f'minimum value to leave: {value_to_leave_in_float} $SUI.')
