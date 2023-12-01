@@ -11,13 +11,13 @@ kriya_swap_value_in_sui_in_range = (0.1, 0.2)
 value_to_leave_in_sui = (0.1, 0.2)
 
 # generate
-mnemonic_number_to_generate = 50
+mnemonic_number_to_generate = 1
 
 # general
-sui_rpc = "https://sui-rpc-mainnet.testnet-pride.com/"
+sui_rpc = "https://mainnet.sui.rpcpool.com/"
 short_sleep_between_txs_in_range_in_sec = (5, 15)
 long_sleep_between_txs_in_range_in_sec = (15, 30)
-start_threads_simultaneously = False
+start_threads_simultaneously = True
 random_account_clusters = False
 
 ######################################################

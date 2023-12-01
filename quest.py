@@ -5,6 +5,7 @@ from loguru import logger
 from config import random_account_clusters
 from data import VERSION
 from modules.claim import main_claim_reward_executor
+from modules.claim_x_transfer import main_claim_x_transfer_executor
 from modules.generator import main_generator
 from modules.kriya import main_kriya_executor
 from modules.minter import main_minter_executor
@@ -36,13 +37,14 @@ if __name__ == '__main__':
                          '1. navi_deposit_borrow_repay();      # there is no withdraw module!\n'
                          '2. scallop_deposit_liquidity();      # following the config\n'
                          '3. scallop_withdraw_liquidity();     # 100% of provided liquidity\n'
-                         '4. kriya_swap(from_token=SUI);       # to $USDC only, following the config\n'
-                         '5. kriya_swap(from_token=USDC);      # to $SUI only, 100% of balance\n\n'
+                         # '4. kriya_swap(from_token=SUI);       # to $USDC only, following the config\n'
+                         # '5. kriya_swap(from_token=USDC);      # to $SUI only, 100% of balance\n\n'
                          '55. report();\n'
                          '56. transfer();\n'
                          '57. mnemonic_generator();\n'
                          '58. capy_mint();\n'
-                         '59. reward_claim();\n\n'
+                         '59. reward_claim();\n'
+                         '59. claim_x_transfer();\n\n'
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
                          # '79. journey();           # deprecated\n\n'
@@ -60,12 +62,12 @@ if __name__ == '__main__':
                 if am_i_sure == 'y':
                     print()
                     main_scallop_executor(sui_configs=random_sui_configs_cluster, withdraw=True)
-            if func == '4':
-                print()
-                main_kriya_executor(sui_configs=random_sui_configs_cluster, token_from='SUI', sui_price=sui_price)
-            if func == '5':
-                print()
-                main_kriya_executor(sui_configs=random_sui_configs_cluster, token_from='USDC', sui_price=sui_price)
+            # if func == '4':
+            #     print()
+            #     main_kriya_executor(sui_configs=random_sui_configs_cluster, token_from='SUI', sui_price=sui_price)
+            # if func == '5':
+            #     print()
+            #     main_kriya_executor(sui_configs=random_sui_configs_cluster, token_from='USDC', sui_price=sui_price)
 
             if func == '55':
                 print()
@@ -84,6 +86,10 @@ if __name__ == '__main__':
             if func == '59':
                 print()
                 main_claim_reward_executor(sui_configs=sui_configs)
+            if func == '60':
+                print()
+                sui_transfer_configs = get_list_of_transfer_configs(mnemonics=transfer_mnemonics)
+                main_claim_x_transfer_executor(transfer_configs=sui_transfer_configs)
 
             # if func == '77':
             #     print()
