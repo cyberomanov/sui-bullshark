@@ -4,6 +4,7 @@ from loguru import logger
 
 from config import random_account_clusters
 from data import VERSION
+from modules.balance_checker import main_balance_executor
 from modules.claim import main_claim_reward_executor
 from modules.claim_x_transfer import main_claim_x_transfer_executor
 from modules.generator import main_generator
@@ -44,7 +45,8 @@ if __name__ == '__main__':
                          '57. mnemonic_generator();\n'
                          '58. capy_mint();\n'
                          '59. reward_claim();\n'
-                         '60. claim_x_transfer();\n\n'
+                         '60. claim_x_transfer();\n'
+                         '61. balance_checker();\n\n'
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
                          # '79. journey();           # deprecated\n\n'
@@ -90,6 +92,10 @@ if __name__ == '__main__':
                 print()
                 sui_transfer_configs = get_list_of_transfer_configs(mnemonics=transfer_mnemonics)
                 main_claim_x_transfer_executor(transfer_configs=sui_transfer_configs)
+
+            if func == '61':
+                print()
+                main_balance_executor(sui_configs=sui_configs)
 
             # if func == '77':
             #     print()
