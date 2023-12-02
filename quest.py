@@ -41,12 +41,16 @@ if __name__ == '__main__':
                          # '4. kriya_swap(from_token=SUI);       # to $USDC only, following the config\n'
                          # '5. kriya_swap(from_token=USDC);      # to $SUI only, 100% of balance\n\n'
                          # '55. report(from="mnemonic.txt");\n'
+                         
                          '56. transfer(from="transfer.txt");\n'
-                         '57. mnemonic_generator();\n'
-                         '58. capy_mint(from="mnemonic.txt");\n'
-                         '59. reward_claim(from="mnemonic.txt");\n'
-                         '60. claim_x_transfer(from="transfer.txt");\n'
-                         '61. balance_checker(from="mnemonic.txt");\n\n'
+                         '57. reward_claim(from="mnemonic.txt");\n'
+                         '58. claim_x_transfer(from="transfer.txt");\n'
+                         
+                         '61. mnemonic_generator();\n'
+                         '62. capy_mint(from="mnemonic.txt");\n'
+                         
+                         '71. balance_checker(from="mnemonic.txt");\n\n'
+                         
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
                          # '79. journey();           # deprecated\n\n'
@@ -71,9 +75,9 @@ if __name__ == '__main__':
             #     print()
             #     main_kriya_executor(sui_configs=random_sui_configs_cluster, token_from='USDC', sui_price=sui_price)
 
-            if func == '55':
-                print()
-                main_report_executor(sui_configs=sui_configs)
+            # if func == '55':
+            #     print()
+            #     main_report_executor(sui_configs=sui_configs)
             if func == '56':
                 print()
                 sui_transfer_configs = get_list_of_transfer_configs(mnemonics=transfer_mnemonics)
@@ -81,19 +85,20 @@ if __name__ == '__main__':
                     main_transfer_executor(transfer_config=config)
             if func == '57':
                 print()
-                main_generator()
-            if func == '58':
-                print()
-                main_minter_executor(sui_configs=sui_configs)
-            if func == '59':
-                print()
                 main_claim_reward_executor(sui_configs=sui_configs)
-            if func == '60':
+            if func == '58':
                 print()
                 sui_transfer_configs = get_list_of_transfer_configs(mnemonics=transfer_mnemonics)
                 main_claim_x_transfer_executor(transfer_configs=sui_transfer_configs)
 
             if func == '61':
+                print()
+                main_generator()
+            if func == '62':
+                print()
+                main_minter_executor(sui_configs=sui_configs)
+
+            if func == '71':
                 print()
                 main_balance_executor(sui_configs=sui_configs)
 
