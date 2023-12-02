@@ -1,12 +1,16 @@
 import base64
 import json
 import random
+import time
 
 import requests
+from loguru import logger
 from pysui import SuiConfig
 from random_username.generate import generate_username
+from twocaptcha import TwoCaptcha
 
-from data import SUI_DENOMINATION, TRANSFER_CRINGE_LIMIT
+from config import two_captcha_api_key
+from data import SUI_DENOMINATION, TRANSFER_CRINGE_LIMIT, RECAPTCHA_SITEKEY
 from datatypes.nickname import NicknameResponse
 from datatypes.signature import SignatureResponse
 from datatypes.sui import SuiBalance
@@ -80,22 +84,43 @@ def get_random_account_cluster(sui_configs: list[SuiConfig], randomize: bool = F
 
 
 def get_signature(address: str, quest_id: int = 3) -> SignatureResponse | bool:
+    captcha = get_recaptcha_answer(
+        url="https://quests.mystenlabs.com/",
+        sitekey=RECAPTCHA_SITEKEY,
+        api_key=two_captcha_api_key
+    )
+
     url = 'https://quests.mystenlabs.com/api/trpc/redeem?batch=1'
     data = {
         "0":
             {
                 "address": address,
-                "questId": quest_id
+                "questId": quest_id,
+                "captcha": captcha["code"]
             }
     }
 
     response = requests.post(url=url, json=data)
     if response.status_code == 500:
         return False
-        # logger.info(f'{address} has no rewards')
-        # return get_signature(address=address, quest_id=quest_id)
     else:
         return SignatureResponse.parse_obj(json.loads(response.content)[0])
+
+
+def get_recaptcha_answer(url: str, sitekey: str, api_key: str):
+    while True:
+        try:
+            config = {
+                'apiKey': api_key,
+                'defaultTimeout': 120,
+                'recaptchaTimeout': 600,
+                'pollingInterval': 10,
+            }
+            solver = TwoCaptcha(**config)
+            return solver.recaptcha(sitekey=sitekey, url=url)
+        except Exception as e:
+            logger.exception(e)
+            time.sleep(1)
 
 
 def encode_signature(signature: str) -> list:
