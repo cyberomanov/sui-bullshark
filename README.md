@@ -12,15 +12,13 @@ this script playing human for points in [quests](https://quests.mystenlabs.com/)
 3. install requirements `pip3 install -r requirements.txt`;
 4. run the script `python3 quest.py`.
 ```bash
-1. navi_deposit_borrow_repay();             # there is no withdraw module!
-2. scallop_deposit_liquidity();             # following the config
-3. scallop_withdraw_liquidity();            # 100% of provided liquidity
-4. kriya_swap(from_token=SUI);              # to $USDC only, following the config
-5. kriya_swap(from_token=USDC);             # to $SUI only, 100% of balance
+56. transfer(from="transfer.txt");
+57. reward_claim(from="mnemonic.txt");
+58. claim_x_transfer(from="transfer.txt");
 
-55. report();
-56. transfer();
-57. mnemonic_generator();
+61. capy_mint(from="mnemonic.txt");
+62. balance_checker(from="mnemonic.txt");
+63. mnemonic_generator(from="config.py");
 ```
 ## Update
 1. `cd sui-bullshark`
