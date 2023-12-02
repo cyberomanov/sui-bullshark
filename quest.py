@@ -44,12 +44,11 @@ if __name__ == '__main__':
                          
                          '56. transfer(from="transfer.txt");\n'
                          '57. reward_claim(from="mnemonic.txt");\n'
-                         '58. claim_x_transfer(from="transfer.txt");\n'
+                         '58. claim_x_transfer(from="transfer.txt");\n\n'
                          
-                         '61. mnemonic_generator();\n'
-                         '62. capy_mint(from="mnemonic.txt");\n'
-                         
-                         '71. balance_checker(from="mnemonic.txt");\n\n'
+                         '61. capy_mint(from="mnemonic.txt");\n'
+                         '62. balance_checker(from="mnemonic.txt");\n'
+                         '63. mnemonic_generator(from="config.py");\n'
                          
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
@@ -93,14 +92,13 @@ if __name__ == '__main__':
 
             if func == '61':
                 print()
-                main_generator()
+                main_minter_executor(sui_configs=sui_configs)
             if func == '62':
                 print()
-                main_minter_executor(sui_configs=sui_configs)
-
-            if func == '71':
-                print()
                 main_balance_executor(sui_configs=sui_configs)
+            if func == '63':
+                print()
+                main_generator()
 
             # if func == '77':
             #     print()
