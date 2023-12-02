@@ -13,6 +13,9 @@ value_to_leave_in_sui = (0.1, 0.2)
 # generate
 mnemonic_number_to_generate = 1
 
+# claim | https://2captcha.com
+two_captcha_api_key = "api_key"
+
 # general
 sui_rpc = "https://mainnet.sui.rpcpool.com/"
 short_sleep_between_txs_in_range_in_sec = (5, 15)
