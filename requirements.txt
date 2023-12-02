@@ -4,3 +4,4 @@ pysui==0.35.0
 random_username==1.0.2
 Requests==2.31.0
 pysui-fastcrypto==0.2.0
+2captcha-python==1.2.2
