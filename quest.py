@@ -48,7 +48,7 @@ if __name__ == '__main__':
                          
                          '61. capy_mint(from="mnemonic.txt");\n'
                          '62. balance_checker(from="mnemonic.txt");\n'
-                         '63. mnemonic_generator(from="config.py");\n'
+                         '63. mnemonic_generator(from="config.py");\n\n'
                          
                          # '77. 8192();              # deprecated\n'
                          # '78. coinflip();          # deprecated\n'
