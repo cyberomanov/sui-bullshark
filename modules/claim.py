@@ -17,7 +17,7 @@ def main_claim_reward(sui_config: SuiConfig):
     try:
         signature_response = get_signature(address=str(sui_config.active_address), quest_id=3)
         if signature_response[0]:
-            signature_bytes = encode_signature(signature=signature_response[0].result.data.signature)
+            signature_bytes = encode_signature(signature=signature_response[1].result.data.signature)
 
             result = claim_reward(sui_config=sui_config, signature=signature_bytes)
 

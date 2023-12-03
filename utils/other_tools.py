@@ -105,7 +105,7 @@ def get_signature(address: str, quest_id: int = 3):
         if response.status_code == 500:
             return False, 'no more rewards'
         else:
-            return SignatureResponse.parse_obj(json.loads(response.content)[0])
+            return True, SignatureResponse.parse_obj(json.loads(response.content)[0])
     else:
         return False, 'captcha error'
 
