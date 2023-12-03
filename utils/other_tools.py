@@ -16,7 +16,7 @@ from datatypes.signature import SignatureResponse
 from datatypes.sui import SuiBalance
 
 
-def read_mnemonics(path: str = 'data/mnemonic.txt'):
+def read_file(path: str = 'data/mnemonic.txt'):
     with open(path) as file:
         not_empty = [line for line in file.read().splitlines() if line]
     return not_empty
@@ -83,28 +83,31 @@ def get_random_account_cluster(sui_configs: list[SuiConfig], randomize: bool = F
         return sui_configs
 
 
-def get_signature(address: str, quest_id: int = 3) -> SignatureResponse | bool:
+def get_signature(address: str, quest_id: int = 3):
     captcha = get_recaptcha_answer(
         url="https://quests.mystenlabs.com/",
         sitekey=RECAPTCHA_SITEKEY,
         api_key=two_captcha_api_key
     )
 
-    url = 'https://quests.mystenlabs.com/api/trpc/redeem?batch=1'
-    data = {
-        "0":
-            {
-                "address": address,
-                "questId": quest_id,
-                "captcha": captcha["code"]
-            }
-    }
+    if captcha:
+        url = 'https://quests.mystenlabs.com/api/trpc/redeem?batch=1'
+        data = {
+            "0":
+                {
+                    "address": address,
+                    "questId": quest_id,
+                    "captcha": captcha["code"]
+                }
+        }
 
-    response = requests.post(url=url, json=data)
-    if response.status_code == 500:
-        return False
+        response = requests.post(url=url, json=data)
+        if response.status_code == 500:
+            return False, 'no more rewards'
+        else:
+            return SignatureResponse.parse_obj(json.loads(response.content)[0])
     else:
-        return SignatureResponse.parse_obj(json.loads(response.content)[0])
+        return False, 'captcha error'
 
 
 def get_recaptcha_answer(url: str, sitekey: str, api_key: str):
@@ -119,8 +122,12 @@ def get_recaptcha_answer(url: str, sitekey: str, api_key: str):
             solver = TwoCaptcha(**config)
             return solver.recaptcha(sitekey=sitekey, url=url)
         except Exception as e:
-            logger.exception(e)
-            time.sleep(1)
+            if e.args[0] == 'ERROR_ZERO_BALANCE':
+                logger.error(f'2captcha: [{api_key}] has zero balance.')
+                return False
+            else:
+                logger.exception(e)
+                time.sleep(1)
 
 
 def encode_signature(signature: str) -> list:

@@ -15,7 +15,7 @@ from modules.report import main_report_executor
 from modules.scallop import main_scallop_executor
 from modules.transfer import main_transfer_executor
 from utils import (add_logger,
-                   read_mnemonics,
+                   read_file,
                    get_list_of_sui_configs,
                    get_list_of_transfer_configs,
                    get_sui_price,
@@ -25,8 +25,8 @@ if __name__ == '__main__':
     add_logger(version=VERSION)
     while True:
         try:
-            mnemonics = read_mnemonics(path='data/mnemonic.txt')
-            transfer_mnemonics = read_mnemonics(path='data/transfer.txt')
+            mnemonics = read_file(path='data/mnemonic.txt')
+            transfer_mnemonics = read_file(path='data/transfer.txt')
 
             sui_configs = get_list_of_sui_configs(mnemonics=mnemonics)
             random_sui_configs_cluster = get_random_account_cluster(sui_configs=sui_configs,

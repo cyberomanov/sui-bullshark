@@ -16,8 +16,8 @@ from utils.other_tools import encode_signature
 def main_claim_reward(sui_config: SuiConfig):
     try:
         signature_response = get_signature(address=str(sui_config.active_address), quest_id=3)
-        if signature_response:
-            signature_bytes = encode_signature(signature=signature_response.result.data.signature)
+        if signature_response[0]:
+            signature_bytes = encode_signature(signature=signature_response[0].result.data.signature)
 
             result = claim_reward(sui_config=sui_config, signature=signature_bytes)
 
@@ -46,7 +46,7 @@ def main_claim_reward(sui_config: SuiConfig):
         else:
             logger.warning(
                     f'{short_address(str(sui_config.active_address))} | REWARD_CLAIM | '
-                    f'no more rewards.')
+                    f'{signature_response[1]}.')
 
     except Exception as e:
         logger.exception(e)
