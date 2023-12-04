@@ -42,6 +42,6 @@ def main_balance_executor(sui_configs: list[SuiConfig]):
         results = executor.map(single_executor, sui_configs)
         total_balance = sum(result.float for result in results)
         logger.info('-' * 90)
-        logger.info(f'total_balance: {total_balance} $SUI.')
+        logger.info(f'total_balance: {round(total_balance, 4)} $SUI.')
 
 
