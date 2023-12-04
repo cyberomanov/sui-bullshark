@@ -84,12 +84,12 @@ def get_sui_balance(sui_config: SuiConfig, coin_type: SuiString = None, denomina
             if denomination:
                 return SuiBalance(
                     int=balance,
-                    float=round(balance / 10 ** denomination, 2)
+                    float=round(balance / 10 ** denomination, 4)
                 )
             else:
                 return SuiBalance(
                     int=balance,
-                    float=round(balance / 10 ** SUI_DENOMINATION, 2)
+                    float=round(balance / 10 ** SUI_DENOMINATION, 4)
                 )
         except:
             if tries <= 5:

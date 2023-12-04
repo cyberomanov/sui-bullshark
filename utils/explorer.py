@@ -127,6 +127,8 @@ def get_associated_kiosk(address: str) -> str:
     for item in response.result.data:
         if item.data.content.fields.for_field:
             return item.data.content.fields.for_field
+        elif 'QuestPass' in item.data.content.type:
+            return item.data.content.type
 
 
 def get_bullshark_id(kiosk_addr: str):
