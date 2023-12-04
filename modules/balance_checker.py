@@ -31,6 +31,8 @@ def single_executor(sui_config: SuiConfig):
                 logger.warning(f'{str(sui_config.active_address)}: {balance.float} $SUI | no any SUIFREN.')
         else:
             logger.warning(f'{str(sui_config.active_address)}: {balance.float} $SUI | no any SUIFREN.')
+
+        return balance
     except Exception as e:
         logger.exception(e)
 
@@ -38,3 +40,8 @@ def single_executor(sui_config: SuiConfig):
 def main_balance_executor(sui_configs: list[SuiConfig]):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(single_executor, sui_configs)
+        total_balance = sum(result.float for result in results)
+        logger.info('-' * 90)
+        logger.info(f'total_balance: {total_balance} $SUI.')
+
+
